@@ -1,0 +1,42 @@
+plugins {
+    id 'antlr'
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    antlr "org.antlr:antlr4:4.5" // use ANTLR version 4
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation 'net.bytebuddy:byte-buddy:1.11.13'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+generateGrammarSource {
+    maxHeapSize = "128m"
+    arguments += ['-package', 'cz.neumimto.nts', '-visitor']
+    outputDirectory = file("src/main/java/cz/neumimto/nts")
+}
+
+compileJava.dependsOn generateGrammarSource
+
+sourceSets {
+    generated {
+        java.srcDir 'generated-src/antlr/main/java/cz/neumimto/nts'
+    }
+}
+
+compileJava.source sourceSets.generated.java, sourceSets.main.java
+
+clean{
+    delete "generated-src"
+}
