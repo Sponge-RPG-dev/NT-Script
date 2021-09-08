@@ -1,5 +1,6 @@
 package cz.neumimto.nts;
 
+import cz.neumimto.nts.bytecode.VisitorImpl;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.asm.AsmVisitorWrapper;
 import net.bytebuddy.description.field.FieldDescription;
@@ -15,14 +16,12 @@ import net.bytebuddy.pool.TypePool;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 public class Tests {
@@ -51,9 +50,9 @@ public class Tests {
               @int3=700000
           END
           
-          FOREACH @entity IN list{size=50}
-              @int4 = 5600
-          END
+         # FOREACH @entity IN list{size=50}
+         #     @int4 = 5600
+         # END
                     
           RETURN Result.OK
         """;
@@ -64,6 +63,7 @@ public class Tests {
         var lexer = new ntsLexer(charStream);
         var stream = new CommonTokenStream(lexer);
         var parser = new ntsParser(stream);
+
         var visitor = new VisitorImpl(new ScriptContext(new HashMap<>(),
                 Set.of(new A(), new B(), new C(), new L()),
                 Set.of(Result.class)));
@@ -82,13 +82,10 @@ public class Tests {
                     @Override
                     public ByteCodeAppender appender(Target implementationTarget) {
                         return (methodVisitor, implementationContext, instrumentedMethod) -> {
-
-                            ParseTreeWalker walker = new ParseTreeWalker();
-                            walker.walk(visitor, parser.script());
-                            List<StackManipulation> impl = visitor.getImpl();
+                            visitor.visit(parser.script());
 
                             StackManipulation.Size size = new StackManipulation.Compound(
-                                    impl
+                                    visitor.getImpl()
                             ).apply(methodVisitor, implementationContext);
 
                             return new ByteCodeAppender.Size(size.getMaximalSize(), instrumentedMethod.getStackSize());
