@@ -15,6 +15,10 @@ public class DecompileTest {
 
         //String c = A.a("www", B.a(50, null));
 
+        if (C.c(50, A.a("w", null))) {
+            int i = 999;
+        }
+
       // Runnable r = () -> {
       //     int i = 0;
       // };

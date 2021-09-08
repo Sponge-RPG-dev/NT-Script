@@ -34,40 +34,40 @@ public class Tests {
     public void test() throws IOException, InstantiationException, IllegalAccessException {
        String k = """
           @text = "test"
-        #  @bool_t = t
-        #  @bool_f = false
+          @bool_t = t
+          @bool_f = false
           @int = 10000
-        #  
-        #  #C O M M E N T
-        #  
-        #  @param = call{string=@text, func=method{int=50}}
-        #  
-           IF test{int= @int, string=call{string=@text}}
-               @int2 = 5000
-           END
-        #  
-        #  IF @bool_f
-        #      @int3=700000
-        #  END
-        #
-        #  @x = list{size=50}
-        #  FOREACH @entity IN @x
-        #     print{val=@entity}
-        #  END
-        #  
-        #  print{val="XXXX"}
-        #  
-        #  FOREACH @entity IN list{size=50}
-        #      print{val=@entity}
-        #  END
-        #
-        #  print{val="XXXX"}
-        #
-        #  FOREACH @entity IN @x
-        #     IF True
-        #      print{val="CCC"}
-        #     END
-        #  END
+          
+          #C O M M E N T
+          
+          @param = call{string=@text, func=method{int=50}}
+          
+          IF test{int= @int, string=call{string=@text}}
+              @int2 = 5000
+          END
+          
+          IF @bool_f
+              @int3=700000
+          END
+        
+          @x = list{size=50}
+          FOREACH @entity IN @x
+             print{val=@entity}
+          END
+          
+          print{val="XXXX"}
+          
+          FOREACH @entity IN list{size=50}
+              print{val=@entity}
+          END
+        
+          print{val="XXXX"}
+        
+          FOREACH @entity IN @x
+             IF True
+              print{val="CCC"}
+             END
+          END
                     
           RETURN Result.OK
         """;
@@ -99,6 +99,7 @@ public class Tests {
                     public ByteCodeAppender appender(Target implementationTarget) {
                         return (methodVisitor, implementationContext, instrumentedMethod) -> {
                             visitor.visit(parser.script());
+
 
                             StackManipulation.Size size = new StackManipulation.Compound(
                                     visitor.getImpl()

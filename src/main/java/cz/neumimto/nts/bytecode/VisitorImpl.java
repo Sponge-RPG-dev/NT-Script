@@ -149,7 +149,7 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
             if (argument == null) {
                 if (parameter.getType() == int.class || parameter.getType() == boolean.class) {
                     argImpl.add(IntegerConstant.forValue(0));
-                } else if (parameter.getType().isAssignableFrom(Object.class)) {
+                } else if (Object.class.isAssignableFrom(parameter.getType())) {
                     argImpl.add(NullConstant.INSTANCE);
                 }
             } else {
