@@ -7,6 +7,7 @@ import cz.neumimto.nts.ntsParser;
 import net.bytebuddy.description.enumeration.EnumerationDescription;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.constant.IntegerConstant;
 import net.bytebuddy.implementation.bytecode.constant.NullConstant;
@@ -16,15 +17,14 @@ import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodReturn;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import net.bytebuddy.jar.asm.Label;
+import net.bytebuddy.jar.asm.MethodVisitor;
 import net.bytebuddy.matcher.ElementMatchers;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
 
@@ -168,11 +168,54 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
         visitChildren(ctx.condition_expression());
         Label ifLabel = new Label();
         impl.add(new Branching.IfEq(ifLabel));
-        visit(ctx.statement_list());
+        visitChildren(ctx.statement_list());
         impl.add(new Branching.Mark(ifLabel));
 
         return impl;
     }
+
+    @Override
+    public List<StackManipulation> visitForeach_statement(ntsParser.Foreach_statementContext ctx) {
+
+        visitChildren(ctx.iterable());
+
+        try {
+            Method m_iterator = Iterable.class.getDeclaredMethod("iterator");
+            Method m_hasNext = Iterator.class.getDeclaredMethod("hasNext");
+            Method m_next = Iterator.class.getDeclaredMethod("next");
+
+            var iterator = MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(m_iterator));
+            impl.add(iterator);
+            Variable variable = scriptContext.createNewVariable(iterator.toString());
+            impl.add(variable.store());
+
+            Label forLabel = new Label();
+            impl.add(new Branching.Mark(forLabel));
+
+            impl.add(variable.load());
+            impl.add(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(m_hasNext)));
+            Label hasNextLabel = new Label();
+            impl.add(new Branching.IfEq(hasNextLabel));
+
+            impl.add(variable.load());
+            impl.add(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(m_next)));
+            Variable nextObj = scriptContext.createNewVariable(ctx.variable_reference().getText());
+            impl.add(nextObj.store());
+
+            // body
+            visitStatement_list(ctx.statement_list());
+
+
+            impl.add(new Branching.GoTo(forLabel));
+            impl.add(new Branching.Mark(hasNextLabel));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return impl;
+    }
+
 
     private ntsParser.ArgumentContext findArgumentForNamedParam(List<ntsParser.ArgumentContext> argument, String value) {
         for (ntsParser.ArgumentContext argumentContext : argument) {

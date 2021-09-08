@@ -60,7 +60,7 @@ function_call : function_name=IDENTIFIER arguments='{'argument? (',' argument)* 
 
 if_statement : IF condition_expression terminator statement_list END ;
 
-foreach_statement : FOREACH variable=VARIABLE_IDENTIFIER IN collection=iterable terminator statement_list END ;
+foreach_statement : FOREACH variable=variable_reference IN collection=iterable terminator statement_list END ;
 
 
 argument : name=IDENTIFIER '=' value=rval   ;

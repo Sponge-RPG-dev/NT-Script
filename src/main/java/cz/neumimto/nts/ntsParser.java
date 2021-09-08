@@ -1072,7 +1072,7 @@ public class ntsParser extends Parser {
 	}
 
 	public static class Foreach_statementContext extends ParserRuleContext {
-		public Token variable;
+		public Variable_referenceContext variable;
 		public IterableContext collection;
 		public TerminalNode FOREACH() { return getToken(ntsParser.FOREACH, 0); }
 		public TerminalNode IN() { return getToken(ntsParser.IN, 0); }
@@ -1083,7 +1083,9 @@ public class ntsParser extends Parser {
 			return getRuleContext(Statement_listContext.class,0);
 		}
 		public TerminalNode END() { return getToken(ntsParser.END, 0); }
-		public TerminalNode VARIABLE_IDENTIFIER() { return getToken(ntsParser.VARIABLE_IDENTIFIER, 0); }
+		public Variable_referenceContext variable_reference() {
+			return getRuleContext(Variable_referenceContext.class,0);
+		}
 		public IterableContext iterable() {
 			return getRuleContext(IterableContext.class,0);
 		}
@@ -1115,7 +1117,7 @@ public class ntsParser extends Parser {
 			setState(134);
 			match(FOREACH);
 			setState(135);
-			((Foreach_statementContext)_localctx).variable = match(VARIABLE_IDENTIFIER);
+			((Foreach_statementContext)_localctx).variable = variable_reference();
 			setState(136);
 			match(IN);
 			setState(137);
@@ -1507,7 +1509,7 @@ public class ntsParser extends Parser {
 		"\2\2\2~\u0080\3\2\2\2\177}\3\2\2\2\u0080\u0081\7\6\2\2\u0081\33\3\2\2"+
 		"\2\u0082\u0083\7\33\2\2\u0083\u0084\5\b\5\2\u0084\u0085\5*\26\2\u0085"+
 		"\u0086\5\4\3\2\u0086\u0087\7\35\2\2\u0087\35\3\2\2\2\u0088\u0089\7\36"+
-		"\2\2\u0089\u008a\7!\2\2\u008a\u008b\7\37\2\2\u008b\u008c\5\26\f\2\u008c"+
+		"\2\2\u0089\u008a\5\16\b\2\u008a\u008b\7\37\2\2\u008b\u008c\5\26\f\2\u008c"+
 		"\u008d\5*\26\2\u008d\u008e\5\4\3\2\u008e\u008f\7\35\2\2\u008f\37\3\2\2"+
 		"\2\u0090\u0091\7 \2\2\u0091\u0092\7\n\2\2\u0092\u0093\5\24\13\2\u0093"+
 		"!\3\2\2\2\u0094\u0095\7\13\2\2\u0095#\3\2\2\2\u0096\u0097\7\7\2\2\u0097"+

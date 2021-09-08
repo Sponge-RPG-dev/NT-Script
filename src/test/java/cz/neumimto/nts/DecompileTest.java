@@ -13,13 +13,13 @@ public class DecompileTest {
 
         //String c = A.a("www", B.a(50, null));
 
-        Runnable r = () -> {
-            int i = 0;
-        };
+      // Runnable r = () -> {
+      //     int i = 0;
+      // };
 
-      //  for (Object o : L.c(10)) {
-      //      int i = 0;
-      //  }
+        for (Object o : L.c(10)) {
+            int i = 0;
+        }
         return Tests.Result.OK;
     }
 

@@ -33,26 +33,26 @@ public class Tests {
     @Test
     public void test() throws IOException, InstantiationException, IllegalAccessException {
        String k = """
-          @text = "test"
-          @bool_t = t
-          @bool_f = false
-          @int = 10000
+        #  @text = "test"
+        #  @bool_t = t
+        #  @bool_f = false
+        #  @int = 10000
+        #  
+        #  #C O M M E N T
+        #  
+        #  @param = call{string=@text, func=method{int=50}}
+        #  
+        #  IF test{int= @int, string=call{string=@text}}
+        #      @int2 = 5000
+        #  END
+        #  
+        #  IF @bool_f
+        #      @int3=700000
+        #  END
           
-          #C O M M E N T
-          
-          @param = call{string=@text, func=method{int=50}}
-          
-          IF test{int=50}#, string=call{string=@text}}
-              @int2 = 5000
+          FOREACH @entity IN list{size=50}
+              @int4 = 5600
           END
-          
-          IF @bool_f
-              @int3=700000
-          END
-          
-         # FOREACH @entity IN list{size=50}
-         #     @int4 = 5600
-         # END
                     
           RETURN Result.OK
         """;
