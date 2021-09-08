@@ -8,6 +8,8 @@ import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static cz.neumimto.nts.annotations.ScriptMeta.*;
+
 public class ScriptContext {
     private Scope rootSccpe;
     private Set<Scope> subScopes = new HashSet<>();
@@ -23,23 +25,24 @@ public class ScriptContext {
     }
 
     public Method findHandler(Object mechanic, String functionName) {
-        String rootVal = mechanic.getClass().getAnnotation(ScriptMeta.Function.class).value();
-        for (Method declaredMethod : mechanic.getClass().getDeclaredMethods()) {
-            if (declaredMethod.isAnnotationPresent(ScriptMeta.Function.class)) {
-                rootVal += declaredMethod.getAnnotation(ScriptMeta.Function.class).value();
+        Class<?> mClass = mechanic.getClass();
+        String rootVal = mClass.isAnnotationPresent(Function.class) ? mClass.getAnnotation(Function.class).value() : "";
+        for (Method declaredMethod : mClass.getDeclaredMethods()) {
+            if (declaredMethod.isAnnotationPresent(Function.class)) {
+                rootVal += declaredMethod.getAnnotation(Function.class).value();
             }
-            if (declaredMethod.isAnnotationPresent(ScriptMeta.Handler.class) && rootVal.equalsIgnoreCase(functionName)) {
+            if (declaredMethod.isAnnotationPresent(Handler.class) && rootVal.equalsIgnoreCase(functionName)) {
                 return declaredMethod;
             }
         }
-        throw new RuntimeException("Mechanic is missing @Handler function " + mechanic.getClass());
+        throw new RuntimeException("Mechanic is missing @Handler function " + mClass);
     }
 
     public Object findMechanic(String functionName) {
         String rootVal = "";
         for (Object mechanic : mechanics) {
-            if (mechanic.getClass().isAnnotationPresent(ScriptMeta.Function.class)) {
-                rootVal = mechanic.getClass().getAnnotation(ScriptMeta.Function.class).value();
+            if (mechanic.getClass().isAnnotationPresent(Function.class)) {
+                rootVal = mechanic.getClass().getAnnotation(Function.class).value();
             }
             if (functionName.equalsIgnoreCase(rootVal)) {
                 return mechanic;
