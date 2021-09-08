@@ -140,7 +140,6 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
         List<StackManipulation> argImpl = new ArrayList<>();
         Parameter[] parameters = scriptContext.findHandler(mechanic).getParameters();
 
-        //todo remove this lookup, build the argument order in exit
         for (Parameter parameter : parameters) {
             ScriptMeta.NamedParam annotation = parameter.getAnnotation(ScriptMeta.NamedParam.class);
             if (annotation == null) {
@@ -148,7 +147,11 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
             }
             ntsParser.ArgumentContext argument = findArgumentForNamedParam(ctx.argument(), annotation.value());
             if (argument == null) {
-                argImpl.add(NullConstant.INSTANCE);
+                if (parameter.getType() == int.class || parameter.getType() == boolean.class) {
+                    argImpl.add(IntegerConstant.forValue(0));
+                } else if (parameter.getType().isAssignableFrom(Object.class)) {
+                    argImpl.add(NullConstant.INSTANCE);
+                }
             } else {
                 ntsParser.RvalContext value = argument.value;
                 String name = argument.name.getText();
@@ -186,12 +189,12 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
 
             var iterator = MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(m_iterator));
             impl.add(iterator);
-            Variable variable = scriptContext.createNewVariable(iterator.toString());
+            Variable variable = scriptContext.createNewVariable(UUID.randomUUID().toString());
             impl.add(variable.store());
 
-            Label forLabel = new Label();
+            Label forLabel = new Label(); //label2
             impl.add(new Branching.Mark(forLabel));
-
+            //hasNext
             impl.add(variable.load());
             impl.add(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(m_hasNext)));
             Label hasNextLabel = new Label();
@@ -203,7 +206,7 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
             impl.add(nextObj.store());
 
             // body
-            visitStatement_list(ctx.statement_list());
+            visitChildren(ctx.statement_list());
 
 
             impl.add(new Branching.GoTo(forLabel));

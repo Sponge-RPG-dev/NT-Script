@@ -35,7 +35,7 @@ public interface Branching extends StackManipulation{
         }
     }
 
-    public static class IfNEq implements StackManipulation {
+    class IfNEq implements StackManipulation {
         private final Label label;
 
         public IfNEq(Label label) {
@@ -54,7 +54,7 @@ public interface Branching extends StackManipulation{
         }
     }
 
-    public static class GoTo implements StackManipulation {
+    class GoTo implements StackManipulation {
         private final Label label;
 
         public GoTo(Label label) {
@@ -73,7 +73,7 @@ public interface Branching extends StackManipulation{
         }
     }
 
-    public static class Mark implements StackManipulation {
+    class Mark implements StackManipulation {
         private final Label label;
 
         public Mark(Label label) {

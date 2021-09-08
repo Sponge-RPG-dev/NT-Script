@@ -6,6 +6,8 @@ public class DecompileTest {
     B B;
     C C;
     L L;
+    P P;
+
     public Tests.Result a() {
        // boolean b = false;
        // boolean a = true;
@@ -17,9 +19,18 @@ public class DecompileTest {
       //     int i = 0;
       // };
 
-        for (Object o : L.c(10)) {
-            int i = 0;
+        Iterable c = L.c(50);
+        for (Object o : c) {
+            int i = 56000;
         }
+
+        String qqqqq = "QQQQQ";
+
+        for (Object o : L.c(10)) {
+            P.print(o, 1);
+            int i = 70000;
+        }
+
         return Tests.Result.OK;
     }
 

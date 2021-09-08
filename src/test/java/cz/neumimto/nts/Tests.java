@@ -33,26 +33,41 @@ public class Tests {
     @Test
     public void test() throws IOException, InstantiationException, IllegalAccessException {
        String k = """
-        #  @text = "test"
+          @text = "test"
         #  @bool_t = t
         #  @bool_f = false
-        #  @int = 10000
+          @int = 10000
         #  
         #  #C O M M E N T
         #  
         #  @param = call{string=@text, func=method{int=50}}
         #  
-        #  IF test{int= @int, string=call{string=@text}}
-        #      @int2 = 5000
-        #  END
+           IF test{int= @int, string=call{string=@text}}
+               @int2 = 5000
+           END
         #  
         #  IF @bool_f
         #      @int3=700000
         #  END
-          
-          FOREACH @entity IN list{size=50}
-              @int4 = 5600
-          END
+        #
+        #  @x = list{size=50}
+        #  FOREACH @entity IN @x
+        #     print{val=@entity}
+        #  END
+        #  
+        #  print{val="XXXX"}
+        #  
+        #  FOREACH @entity IN list{size=50}
+        #      print{val=@entity}
+        #  END
+        #
+        #  print{val="XXXX"}
+        #
+        #  FOREACH @entity IN @x
+        #     IF True
+        #      print{val="CCC"}
+        #     END
+        #  END
                     
           RETURN Result.OK
         """;
@@ -65,7 +80,7 @@ public class Tests {
         var parser = new ntsParser(stream);
 
         var visitor = new VisitorImpl(new ScriptContext(new HashMap<>(),
-                Set.of(new A(), new B(), new C(), new L()),
+                Set.of(new A(), new B(), new C(), new L(), new P()),
                 Set.of(Result.class)));
 
 
@@ -76,6 +91,7 @@ public class Tests {
                 .defineField("A", A.class, Modifier.PUBLIC)
                 .defineField("B", B.class, Modifier.PUBLIC)
                 .defineField("C", C.class, Modifier.PUBLIC)
+                .defineField("P", P.class, Modifier.PUBLIC)
                 .defineField("L", L.class, Modifier.PUBLIC)
                 .defineMethod("test", Result.class, Modifier.PUBLIC)
                 .intercept(new Implementation() {
@@ -101,6 +117,17 @@ public class Tests {
         bb.saveIn(new File("/tmp/test/"));
         Class<?> loaded = bb.load(this.getClass().getClassLoader()).getLoaded();
         Object o = loaded.newInstance();
+        try {
+            o.getClass().getDeclaredField("A").set(o, new A());
+            o.getClass().getDeclaredField("B").set(o, new B());
+            o.getClass().getDeclaredField("C").set(o, new C());
+            o.getClass().getDeclaredField("L").set(o, new L());
+            o.getClass().getDeclaredField("P").set(o, new P());
+            o.getClass().getDeclaredMethod("test").invoke(o);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
     }
 
     static class EnableFramesComputing implements AsmVisitorWrapper {
