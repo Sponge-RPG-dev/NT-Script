@@ -138,7 +138,7 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
         impl.add(FieldAccess.forField(field).read());
 
         List<StackManipulation> argImpl = new ArrayList<>();
-        Parameter[] parameters = scriptContext.findHandler(mechanic).getParameters();
+        Parameter[] parameters = scriptContext.findHandler(mechanic, functionName).getParameters();
 
         for (Parameter parameter : parameters) {
             ScriptMeta.NamedParam annotation = parameter.getAnnotation(ScriptMeta.NamedParam.class);
@@ -160,7 +160,7 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
         }
         impl.addAll(argImpl);
 
-        Method method = scriptContext.findHandler(mechanic);
+        Method method = scriptContext.findHandler(mechanic, functionName);
         impl.add(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(method)));
 
         return impl;

@@ -22,9 +22,13 @@ public class ScriptContext {
         this.enums = enums;
     }
 
-    public Method findHandler(Object mechanic) {
+    public Method findHandler(Object mechanic, String functionName) {
+        String rootVal = mechanic.getClass().getAnnotation(ScriptMeta.Function.class).value();
         for (Method declaredMethod : mechanic.getClass().getDeclaredMethods()) {
-            if (declaredMethod.isAnnotationPresent(ScriptMeta.Handler.class)) {
+            if (declaredMethod.isAnnotationPresent(ScriptMeta.Function.class)) {
+                rootVal += declaredMethod.getAnnotation(ScriptMeta.Function.class).value();
+            }
+            if (declaredMethod.isAnnotationPresent(ScriptMeta.Handler.class) && rootVal.equalsIgnoreCase(functionName)) {
                 return declaredMethod;
             }
         }
@@ -32,10 +36,19 @@ public class ScriptContext {
     }
 
     public Object findMechanic(String functionName) {
+        String rootVal = "";
         for (Object mechanic : mechanics) {
-            if (mechanic.getClass().getAnnotation(ScriptMeta.Function.class).value().equalsIgnoreCase(functionName)) {
+            if (mechanic.getClass().isAnnotationPresent(ScriptMeta.Function.class)) {
+                rootVal = mechanic.getClass().getAnnotation(ScriptMeta.Function.class).value();
+            }
+            if (functionName.equalsIgnoreCase(rootVal)) {
                 return mechanic;
             }
+            try {
+                findHandler(mechanic, functionName);
+                return mechanic;
+            } catch (RuntimeException e) {}
+
         }
         throw new RuntimeException("Unknown mechanic " + functionName);
     }

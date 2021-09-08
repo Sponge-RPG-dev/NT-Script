@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 public interface ScriptMeta {
 
-    @Target(ElementType.TYPE)
+    @Target({ElementType.TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @interface Function {
         String value();
