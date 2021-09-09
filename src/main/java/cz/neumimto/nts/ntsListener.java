@@ -59,6 +59,66 @@ public interface ntsListener extends ParseTreeListener {
 	 */
 	void exitType_comparison(ntsParser.Type_comparisonContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ntsParser#op_less}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_less(ntsParser.Op_lessContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#op_less}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_less(ntsParser.Op_lessContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ntsParser#op_greater}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_greater(ntsParser.Op_greaterContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#op_greater}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_greater(ntsParser.Op_greaterContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ntsParser#op_less_eq}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_less_eq(ntsParser.Op_less_eqContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#op_less_eq}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_less_eq(ntsParser.Op_less_eqContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ntsParser#op_greater_eq}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_greater_eq(ntsParser.Op_greater_eqContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#op_greater_eq}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_greater_eq(ntsParser.Op_greater_eqContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ntsParser#op_eq}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_eq(ntsParser.Op_eqContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#op_eq}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_eq(ntsParser.Op_eqContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ntsParser#op_neq}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_neq(ntsParser.Op_neqContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#op_neq}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_neq(ntsParser.Op_neqContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ntsParser#comparable_expr}.
 	 * @param ctx the parse tree
 	 */

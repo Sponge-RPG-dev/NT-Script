@@ -55,7 +55,8 @@ public class Tests {
              print{val=@entity}
           END
           
-          print{val="XXXX"}
+          print{val="POP NEXT"}
+          list{size=50}
           
           FOREACH @entity IN list{size=50}
               print{val=@entity}

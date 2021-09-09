@@ -23,11 +23,19 @@ statement : assignment_statement
 condition_expression : function_call
                      | type_bool
                      | variable_reference
+                     | type_comparison
                      ;
 
 type_comparison : left=comparable_expr op=( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) right=comparable_expr
                 | left=comparable_expr op=( EQUAL | NOT_EQUAL ) right=comparable_expr
                 ;
+
+op_less    : LESS ;
+op_greater : GREATER ;
+op_less_eq : LESS_EQUAL ;
+op_greater_eq : GREATER_EQUAL ;
+op_eq : EQUAL ;
+op_neq : NOT_EQUAL;
 
 comparable_expr : type_bool
                 | type_integer

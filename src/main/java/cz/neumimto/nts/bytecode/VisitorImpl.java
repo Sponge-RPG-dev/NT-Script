@@ -7,7 +7,7 @@ import cz.neumimto.nts.ntsParser;
 import net.bytebuddy.description.enumeration.EnumerationDescription;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.implementation.Implementation;
+import net.bytebuddy.implementation.bytecode.Removal;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.constant.IntegerConstant;
 import net.bytebuddy.implementation.bytecode.constant.NullConstant;
@@ -17,9 +17,7 @@ import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodReturn;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import net.bytebuddy.jar.asm.Label;
-import net.bytebuddy.jar.asm.MethodVisitor;
 import net.bytebuddy.matcher.ElementMatchers;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.lang.reflect.Method;
@@ -163,6 +161,9 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
         Method method = scriptContext.findHandler(mechanic, functionName);
         impl.add(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(method)));
 
+        if (method.getReturnType() != void.class && ctx.getParent() instanceof ntsParser.StatementContext) {
+            impl.add(Removal.SINGLE);
+        }
         return impl;
     }
 
@@ -218,7 +219,6 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
 
         return impl;
     }
-
 
     private ntsParser.ArgumentContext findArgumentForNamedParam(List<ntsParser.ArgumentContext> argument, String value) {
         for (ntsParser.ArgumentContext argumentContext : argument) {

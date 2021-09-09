@@ -15,25 +15,16 @@ public class DecompileTest {
 
         //String c = A.a("www", B.a(50, null));
 
-        if (C.c(50, A.a("w", null))) {
-            int i = 999;
-        }
+        C.c(100, null);
+    //   int i = (int) (1 * Math.random());
+    //   int b = 30;
+    //   boolean k = i < b;
 
       // Runnable r = () -> {
       //     int i = 0;
       // };
 
-        Iterable c = L.c(50);
-        for (Object o : c) {
-            int i = 56000;
-        }
 
-        String qqqqq = "QQQQQ";
-
-        for (Object o : L.c(10)) {
-            P.print(o, 1);
-            int i = 70000;
-        }
 
         return Tests.Result.OK;
     }
