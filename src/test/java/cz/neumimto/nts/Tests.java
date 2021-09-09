@@ -50,7 +50,7 @@ public class Tests {
               @int3=700000
           END
         
-          @x = list{size=50}
+          @x = list{size=3}
           FOREACH @entity IN @x
              print{val=@entity}
           END
@@ -58,7 +58,7 @@ public class Tests {
           print{val="POP NEXT"}
           list{size=50}
           
-          FOREACH @entity IN list{size=50}
+          FOREACH @entity IN list{size=5}
               print{val=@entity}
           END
         
@@ -69,7 +69,13 @@ public class Tests {
               print{val="CCC"}
              END
           END
-                    
+          
+          IF @int <= 70000
+            print{val="@int <= 70000"}
+          END
+          
+          @lesser = @int <= 70000;
+          
           RETURN Result.OK
         """;
    // k = """

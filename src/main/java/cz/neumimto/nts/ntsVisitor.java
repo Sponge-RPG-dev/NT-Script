@@ -42,42 +42,6 @@ public interface ntsVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitType_comparison(ntsParser.Type_comparisonContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ntsParser#op_less}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOp_less(ntsParser.Op_lessContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ntsParser#op_greater}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOp_greater(ntsParser.Op_greaterContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ntsParser#op_less_eq}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOp_less_eq(ntsParser.Op_less_eqContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ntsParser#op_greater_eq}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOp_greater_eq(ntsParser.Op_greater_eqContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ntsParser#op_eq}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOp_eq(ntsParser.Op_eqContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ntsParser#op_neq}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOp_neq(ntsParser.Op_neqContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link ntsParser#comparable_expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

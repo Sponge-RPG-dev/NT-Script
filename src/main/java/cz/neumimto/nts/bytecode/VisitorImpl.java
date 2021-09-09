@@ -169,11 +169,30 @@ public class VisitorImpl extends ntsBaseVisitor<List<StackManipulation>> {
 
     @Override
     public List<StackManipulation> visitIf_statement(ntsParser.If_statementContext ctx) {
-        visitChildren(ctx.condition_expression());
+
         Label ifLabel = new Label();
-        impl.add(new Branching.IfEq(ifLabel));
+
+
+        ntsParser.Type_comparisonContext type_comparisonContext = ctx.condition_expression().type_comparison();
+        if (type_comparisonContext != null) {
+            visitChildren(type_comparisonContext.left);
+            visitChildren(type_comparisonContext.right);
+            String text = type_comparisonContext.op.getText();
+            impl.add(Branching.ArithmeticalComp.forToken(text, ifLabel));
+        } else {
+            visitChildren(ctx.condition_expression());
+            impl.add(new Branching.IfEq(ifLabel));
+        }
         visitChildren(ctx.statement_list());
         impl.add(new Branching.Mark(ifLabel));
+
+        return impl;
+    }
+
+    @Override
+    public List<StackManipulation> visitType_comparison(ntsParser.Type_comparisonContext ctx) {
+        visitChildren(ctx.left);
+        visitChildren(ctx.right);
 
         return impl;
     }

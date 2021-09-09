@@ -15,13 +15,35 @@ public interface Branching extends StackManipulation{
 
     Label label();
 
-    class ArithmeticalComp implements StackManipulation {
+    static class ArithmeticalComp implements StackManipulation {
         private final Label label;
         private final int opcode;
 
         public ArithmeticalComp(Label label, int opcode) {
             this.label = label;
             this.opcode = opcode;
+        }
+
+        public static StackManipulation forToken(String text, Label ifLabel) {
+            int opCode = switch (text) {
+                case "<":
+                    yield Opcodes.IF_ICMPGE;
+                case ">":
+                    yield Opcodes.IF_ICMPLE;
+                case ">=":
+                case "=>":
+                    yield Opcodes.IF_ICMPLT;
+                case "<=":
+                case "=<":
+                    yield Opcodes.IF_ICMPGT;
+                case "==":
+                    yield Opcodes.IF_ICMPEQ;
+                case "!=":
+                    yield Opcodes.IF_ICMPNE;
+                default:
+                    throw new RuntimeException("Unknown comp sign " + text);
+            };
+            return new ArithmeticalComp(ifLabel, opCode);
         }
 
         @Override

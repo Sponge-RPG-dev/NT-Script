@@ -11,11 +11,11 @@ public class DecompileTest {
     public Tests.Result a() {
        // boolean b = false;
        // boolean a = true;
-       // int ldc = 70000;
+        int ldc = 70000;
 
-        //String c = A.a("www", B.a(50, null));
 
-        C.c(100, null);
+        boolean b = ldc < 70000;
+
     //   int i = (int) (1 * Math.random());
     //   int b = 30;
     //   boolean k = i < b;

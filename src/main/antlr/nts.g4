@@ -30,16 +30,10 @@ type_comparison : left=comparable_expr op=( LESS | GREATER | LESS_EQUAL | GREATE
                 | left=comparable_expr op=( EQUAL | NOT_EQUAL ) right=comparable_expr
                 ;
 
-op_less    : LESS ;
-op_greater : GREATER ;
-op_less_eq : LESS_EQUAL ;
-op_greater_eq : GREATER_EQUAL ;
-op_eq : EQUAL ;
-op_neq : NOT_EQUAL;
-
 comparable_expr : type_bool
                 | type_integer
                 | variable_reference
+                | function_call
                 ;
 
 variable_reference : variable=VARIABLE_IDENTIFIER ;
@@ -54,6 +48,7 @@ rval : type_literal
      | type_enum
      | type_bool
      | variable_reference
+     | type_comparison
      ;
 
 iterable :
@@ -110,10 +105,10 @@ EXP : '**';
 
 EQUAL : '==';
 NOT_EQUAL : '!=';
+LESS_EQUAL : ('<='|'=<');
+GREATER_EQUAL : ('>='|'=>');
 GREATER : '>';
 LESS : '<';
-LESS_EQUAL : '<=';
-GREATER_EQUAL : '>=';
 
 IF : I F;
 ELSE : E L S E;

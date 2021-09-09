@@ -19,21 +19,18 @@ public class ntsParser extends Parser {
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, LITERAL=5, WS=6, SL_COMMENT=7, ASSIGN=8, 
 		CRLF=9, RETURN=10, TRUE=11, FALSE=12, PLUS=13, MINUS=14, MUL=15, DIV=16, 
-		MOD=17, EXP=18, EQUAL=19, NOT_EQUAL=20, GREATER=21, LESS=22, LESS_EQUAL=23, 
-		GREATER_EQUAL=24, IF=25, ELSE=26, END=27, FOREACH=28, IN=29, IDENTIFIER=30, 
+		MOD=17, EXP=18, EQUAL=19, NOT_EQUAL=20, LESS_EQUAL=21, GREATER_EQUAL=22, 
+		GREATER=23, LESS=24, IF=25, ELSE=26, END=27, FOREACH=28, IN=29, IDENTIFIER=30, 
 		VARIABLE_IDENTIFIER=31, INT=32;
 	public static final int
 		RULE_script = 0, RULE_statement_list = 1, RULE_statement = 2, RULE_condition_expression = 3, 
-		RULE_type_comparison = 4, RULE_op_less = 5, RULE_op_greater = 6, RULE_op_less_eq = 7, 
-		RULE_op_greater_eq = 8, RULE_op_eq = 9, RULE_op_neq = 10, RULE_comparable_expr = 11, 
-		RULE_variable_reference = 12, RULE_assignment_statement = 13, RULE_return_statement = 14, 
-		RULE_rval = 15, RULE_iterable = 16, RULE_type_enum = 17, RULE_function_call = 18, 
-		RULE_if_statement = 19, RULE_foreach_statement = 20, RULE_argument = 21, 
-		RULE_newline = 22, RULE_type_literal = 23, RULE_type_integer = 24, RULE_type_bool = 25, 
-		RULE_terminator = 26;
+		RULE_type_comparison = 4, RULE_comparable_expr = 5, RULE_variable_reference = 6, 
+		RULE_assignment_statement = 7, RULE_return_statement = 8, RULE_rval = 9, 
+		RULE_iterable = 10, RULE_type_enum = 11, RULE_function_call = 12, RULE_if_statement = 13, 
+		RULE_foreach_statement = 14, RULE_argument = 15, RULE_newline = 16, RULE_type_literal = 17, 
+		RULE_type_integer = 18, RULE_type_bool = 19, RULE_terminator = 20;
 	public static final String[] ruleNames = {
 		"script", "statement_list", "statement", "condition_expression", "type_comparison", 
-		"op_less", "op_greater", "op_less_eq", "op_greater_eq", "op_eq", "op_neq", 
 		"comparable_expr", "variable_reference", "assignment_statement", "return_statement", 
 		"rval", "iterable", "type_enum", "function_call", "if_statement", "foreach_statement", 
 		"argument", "newline", "type_literal", "type_integer", "type_bool", "terminator"
@@ -42,13 +39,13 @@ public class ntsParser extends Parser {
 	private static final String[] _LITERAL_NAMES = {
 		null, "'.'", "'{'", "','", "'}'", null, null, null, "'='", null, null, 
 		null, null, "'+'", "'-'", "'*'", "'/'", "'%'", "'**'", "'=='", "'!='", 
-		"'>'", "'<'", "'<='", "'>='"
+		null, null, "'>'", "'<'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
 		null, null, null, null, null, "LITERAL", "WS", "SL_COMMENT", "ASSIGN", 
 		"CRLF", "RETURN", "TRUE", "FALSE", "PLUS", "MINUS", "MUL", "DIV", "MOD", 
-		"EXP", "EQUAL", "NOT_EQUAL", "GREATER", "LESS", "LESS_EQUAL", "GREATER_EQUAL", 
-		"IF", "ELSE", "END", "FOREACH", "IN", "IDENTIFIER", "VARIABLE_IDENTIFIER", 
+		"EXP", "EQUAL", "NOT_EQUAL", "LESS_EQUAL", "GREATER_EQUAL", "GREATER", 
+		"LESS", "IF", "ELSE", "END", "FOREACH", "IN", "IDENTIFIER", "VARIABLE_IDENTIFIER", 
 		"INT"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
@@ -130,9 +127,9 @@ public class ntsParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(54);
+			setState(42);
 			statement_list(0);
-			setState(55);
+			setState(43);
 			match(EOF);
 			}
 		}
@@ -191,7 +188,7 @@ public class ntsParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(62);
+			setState(50);
 			switch (_input.LA(1)) {
 			case RETURN:
 			case IF:
@@ -199,15 +196,15 @@ public class ntsParser extends Parser {
 			case IDENTIFIER:
 			case VARIABLE_IDENTIFIER:
 				{
-				setState(58);
+				setState(46);
 				statement();
-				setState(59);
+				setState(47);
 				terminator(0);
 				}
 				break;
 			case CRLF:
 				{
-				setState(61);
+				setState(49);
 				terminator(0);
 				}
 				break;
@@ -215,7 +212,7 @@ public class ntsParser extends Parser {
 				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(70);
+			setState(58);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,1,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -226,16 +223,16 @@ public class ntsParser extends Parser {
 					{
 					_localctx = new Statement_listContext(_parentctx, _parentState);
 					pushNewRecursionContext(_localctx, _startState, RULE_statement_list);
-					setState(64);
+					setState(52);
 					if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-					setState(65);
+					setState(53);
 					statement();
-					setState(66);
+					setState(54);
 					terminator(0);
 					}
 					} 
 				}
-				setState(72);
+				setState(60);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,1,_ctx);
 			}
@@ -291,40 +288,40 @@ public class ntsParser extends Parser {
 		StatementContext _localctx = new StatementContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_statement);
 		try {
-			setState(78);
+			setState(66);
 			switch (_input.LA(1)) {
 			case VARIABLE_IDENTIFIER:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(73);
+				setState(61);
 				assignment_statement();
 				}
 				break;
 			case IDENTIFIER:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(74);
+				setState(62);
 				function_call();
 				}
 				break;
 			case RETURN:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(75);
+				setState(63);
 				return_statement();
 				}
 				break;
 			case IF:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(76);
+				setState(64);
 				if_statement();
 				}
 				break;
 			case FOREACH:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(77);
+				setState(65);
 				foreach_statement();
 				}
 				break;
@@ -379,33 +376,33 @@ public class ntsParser extends Parser {
 		Condition_expressionContext _localctx = new Condition_expressionContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_condition_expression);
 		try {
-			setState(84);
+			setState(72);
 			switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(80);
+				setState(68);
 				function_call();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(81);
+				setState(69);
 				type_bool();
 				}
 				break;
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(82);
+				setState(70);
 				variable_reference();
 				}
 				break;
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(83);
+				setState(71);
 				type_comparison();
 				}
 				break;
@@ -462,31 +459,31 @@ public class ntsParser extends Parser {
 		enterRule(_localctx, 8, RULE_type_comparison);
 		int _la;
 		try {
-			setState(94);
+			setState(82);
 			switch ( getInterpreter().adaptivePredict(_input,4,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(86);
+				setState(74);
 				((Type_comparisonContext)_localctx).left = comparable_expr();
-				setState(87);
+				setState(75);
 				((Type_comparisonContext)_localctx).op = _input.LT(1);
 				_la = _input.LA(1);
-				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GREATER) | (1L << LESS) | (1L << LESS_EQUAL) | (1L << GREATER_EQUAL))) != 0)) ) {
+				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << LESS_EQUAL) | (1L << GREATER_EQUAL) | (1L << GREATER) | (1L << LESS))) != 0)) ) {
 					((Type_comparisonContext)_localctx).op = (Token)_errHandler.recoverInline(this);
 				} else {
 					consume();
 				}
-				setState(88);
+				setState(76);
 				((Type_comparisonContext)_localctx).right = comparable_expr();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(90);
+				setState(78);
 				((Type_comparisonContext)_localctx).left = comparable_expr();
-				setState(91);
+				setState(79);
 				((Type_comparisonContext)_localctx).op = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !(_la==EQUAL || _la==NOT_EQUAL) ) {
@@ -494,262 +491,10 @@ public class ntsParser extends Parser {
 				} else {
 					consume();
 				}
-				setState(92);
+				setState(80);
 				((Type_comparisonContext)_localctx).right = comparable_expr();
 				}
 				break;
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Op_lessContext extends ParserRuleContext {
-		public TerminalNode LESS() { return getToken(ntsParser.LESS, 0); }
-		public Op_lessContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_op_less; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).enterOp_less(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).exitOp_less(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ntsVisitor ) return ((ntsVisitor<? extends T>)visitor).visitOp_less(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Op_lessContext op_less() throws RecognitionException {
-		Op_lessContext _localctx = new Op_lessContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_op_less);
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(96);
-			match(LESS);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Op_greaterContext extends ParserRuleContext {
-		public TerminalNode GREATER() { return getToken(ntsParser.GREATER, 0); }
-		public Op_greaterContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_op_greater; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).enterOp_greater(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).exitOp_greater(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ntsVisitor ) return ((ntsVisitor<? extends T>)visitor).visitOp_greater(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Op_greaterContext op_greater() throws RecognitionException {
-		Op_greaterContext _localctx = new Op_greaterContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_op_greater);
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(98);
-			match(GREATER);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Op_less_eqContext extends ParserRuleContext {
-		public TerminalNode LESS_EQUAL() { return getToken(ntsParser.LESS_EQUAL, 0); }
-		public Op_less_eqContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_op_less_eq; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).enterOp_less_eq(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).exitOp_less_eq(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ntsVisitor ) return ((ntsVisitor<? extends T>)visitor).visitOp_less_eq(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Op_less_eqContext op_less_eq() throws RecognitionException {
-		Op_less_eqContext _localctx = new Op_less_eqContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_op_less_eq);
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(100);
-			match(LESS_EQUAL);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Op_greater_eqContext extends ParserRuleContext {
-		public TerminalNode GREATER_EQUAL() { return getToken(ntsParser.GREATER_EQUAL, 0); }
-		public Op_greater_eqContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_op_greater_eq; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).enterOp_greater_eq(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).exitOp_greater_eq(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ntsVisitor ) return ((ntsVisitor<? extends T>)visitor).visitOp_greater_eq(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Op_greater_eqContext op_greater_eq() throws RecognitionException {
-		Op_greater_eqContext _localctx = new Op_greater_eqContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_op_greater_eq);
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(102);
-			match(GREATER_EQUAL);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Op_eqContext extends ParserRuleContext {
-		public TerminalNode EQUAL() { return getToken(ntsParser.EQUAL, 0); }
-		public Op_eqContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_op_eq; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).enterOp_eq(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).exitOp_eq(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ntsVisitor ) return ((ntsVisitor<? extends T>)visitor).visitOp_eq(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Op_eqContext op_eq() throws RecognitionException {
-		Op_eqContext _localctx = new Op_eqContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_op_eq);
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(104);
-			match(EQUAL);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Op_neqContext extends ParserRuleContext {
-		public TerminalNode NOT_EQUAL() { return getToken(ntsParser.NOT_EQUAL, 0); }
-		public Op_neqContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_op_neq; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).enterOp_neq(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ntsListener ) ((ntsListener)listener).exitOp_neq(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ntsVisitor ) return ((ntsVisitor<? extends T>)visitor).visitOp_neq(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Op_neqContext op_neq() throws RecognitionException {
-		Op_neqContext _localctx = new Op_neqContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_op_neq);
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(106);
-			match(NOT_EQUAL);
 			}
 		}
 		catch (RecognitionException re) {
@@ -794,29 +539,29 @@ public class ntsParser extends Parser {
 
 	public final Comparable_exprContext comparable_expr() throws RecognitionException {
 		Comparable_exprContext _localctx = new Comparable_exprContext(_ctx, getState());
-		enterRule(_localctx, 22, RULE_comparable_expr);
+		enterRule(_localctx, 10, RULE_comparable_expr);
 		try {
-			setState(111);
+			setState(87);
 			switch (_input.LA(1)) {
 			case TRUE:
 			case FALSE:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(108);
+				setState(84);
 				type_bool();
 				}
 				break;
 			case INT:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(109);
+				setState(85);
 				type_integer();
 				}
 				break;
 			case VARIABLE_IDENTIFIER:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(110);
+				setState(86);
 				variable_reference();
 				}
 				break;
@@ -859,11 +604,11 @@ public class ntsParser extends Parser {
 
 	public final Variable_referenceContext variable_reference() throws RecognitionException {
 		Variable_referenceContext _localctx = new Variable_referenceContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_variable_reference);
+		enterRule(_localctx, 12, RULE_variable_reference);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(113);
+			setState(89);
 			((Variable_referenceContext)_localctx).variable = match(VARIABLE_IDENTIFIER);
 			}
 		}
@@ -906,15 +651,15 @@ public class ntsParser extends Parser {
 
 	public final Assignment_statementContext assignment_statement() throws RecognitionException {
 		Assignment_statementContext _localctx = new Assignment_statementContext(_ctx, getState());
-		enterRule(_localctx, 26, RULE_assignment_statement);
+		enterRule(_localctx, 14, RULE_assignment_statement);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(115);
+			setState(91);
 			((Assignment_statementContext)_localctx).name = match(VARIABLE_IDENTIFIER);
-			setState(116);
+			setState(92);
 			match(ASSIGN);
-			setState(117);
+			setState(93);
 			((Assignment_statementContext)_localctx).value = rval();
 			}
 		}
@@ -956,13 +701,13 @@ public class ntsParser extends Parser {
 
 	public final Return_statementContext return_statement() throws RecognitionException {
 		Return_statementContext _localctx = new Return_statementContext(_ctx, getState());
-		enterRule(_localctx, 28, RULE_return_statement);
+		enterRule(_localctx, 16, RULE_return_statement);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(119);
+			setState(95);
 			match(RETURN);
-			setState(120);
+			setState(96);
 			((Return_statementContext)_localctx).value = rval();
 			}
 		}
@@ -1017,49 +762,49 @@ public class ntsParser extends Parser {
 
 	public final RvalContext rval() throws RecognitionException {
 		RvalContext _localctx = new RvalContext(_ctx, getState());
-		enterRule(_localctx, 30, RULE_rval);
+		enterRule(_localctx, 18, RULE_rval);
 		try {
-			setState(128);
+			setState(104);
 			switch ( getInterpreter().adaptivePredict(_input,6,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(122);
+				setState(98);
 				type_literal();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(123);
+				setState(99);
 				type_integer();
 				}
 				break;
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(124);
+				setState(100);
 				function_call();
 				}
 				break;
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(125);
+				setState(101);
 				type_enum();
 				}
 				break;
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(126);
+				setState(102);
 				type_bool();
 				}
 				break;
 			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(127);
+				setState(103);
 				variable_reference();
 				}
 				break;
@@ -1104,9 +849,9 @@ public class ntsParser extends Parser {
 
 	public final IterableContext iterable() throws RecognitionException {
 		IterableContext _localctx = new IterableContext(_ctx, getState());
-		enterRule(_localctx, 32, RULE_iterable);
+		enterRule(_localctx, 20, RULE_iterable);
 		try {
-			setState(133);
+			setState(109);
 			switch (_input.LA(1)) {
 			case CRLF:
 				enterOuterAlt(_localctx, 1);
@@ -1116,14 +861,14 @@ public class ntsParser extends Parser {
 			case IDENTIFIER:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(131);
+				setState(107);
 				function_call();
 				}
 				break;
 			case VARIABLE_IDENTIFIER:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(132);
+				setState(108);
 				variable_reference();
 				}
 				break;
@@ -1170,15 +915,15 @@ public class ntsParser extends Parser {
 
 	public final Type_enumContext type_enum() throws RecognitionException {
 		Type_enumContext _localctx = new Type_enumContext(_ctx, getState());
-		enterRule(_localctx, 34, RULE_type_enum);
+		enterRule(_localctx, 22, RULE_type_enum);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(135);
+			setState(111);
 			((Type_enumContext)_localctx).type = match(IDENTIFIER);
-			setState(136);
+			setState(112);
 			match(T__0);
-			setState(137);
+			setState(113);
 			((Type_enumContext)_localctx).value = match(IDENTIFIER);
 			}
 		}
@@ -1224,41 +969,41 @@ public class ntsParser extends Parser {
 
 	public final Function_callContext function_call() throws RecognitionException {
 		Function_callContext _localctx = new Function_callContext(_ctx, getState());
-		enterRule(_localctx, 36, RULE_function_call);
+		enterRule(_localctx, 24, RULE_function_call);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(139);
+			setState(115);
 			((Function_callContext)_localctx).function_name = match(IDENTIFIER);
-			setState(140);
+			setState(116);
 			((Function_callContext)_localctx).arguments = match(T__1);
-			setState(142);
+			setState(118);
 			_la = _input.LA(1);
 			if (_la==IDENTIFIER) {
 				{
-				setState(141);
+				setState(117);
 				argument();
 				}
 			}
 
-			setState(148);
+			setState(124);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T__2) {
 				{
 				{
-				setState(144);
+				setState(120);
 				match(T__2);
-				setState(145);
+				setState(121);
 				argument();
 				}
 				}
-				setState(150);
+				setState(126);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(151);
+			setState(127);
 			match(T__3);
 			}
 		}
@@ -1306,19 +1051,19 @@ public class ntsParser extends Parser {
 
 	public final If_statementContext if_statement() throws RecognitionException {
 		If_statementContext _localctx = new If_statementContext(_ctx, getState());
-		enterRule(_localctx, 38, RULE_if_statement);
+		enterRule(_localctx, 26, RULE_if_statement);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(153);
+			setState(129);
 			match(IF);
-			setState(154);
+			setState(130);
 			condition_expression();
-			setState(155);
+			setState(131);
 			terminator(0);
-			setState(156);
+			setState(132);
 			statement_list(0);
-			setState(157);
+			setState(133);
 			match(END);
 			}
 		}
@@ -1372,23 +1117,23 @@ public class ntsParser extends Parser {
 
 	public final Foreach_statementContext foreach_statement() throws RecognitionException {
 		Foreach_statementContext _localctx = new Foreach_statementContext(_ctx, getState());
-		enterRule(_localctx, 40, RULE_foreach_statement);
+		enterRule(_localctx, 28, RULE_foreach_statement);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(159);
+			setState(135);
 			match(FOREACH);
-			setState(160);
+			setState(136);
 			((Foreach_statementContext)_localctx).variable = variable_reference();
-			setState(161);
+			setState(137);
 			match(IN);
-			setState(162);
+			setState(138);
 			((Foreach_statementContext)_localctx).collection = iterable();
-			setState(163);
+			setState(139);
 			terminator(0);
-			setState(164);
+			setState(140);
 			statement_list(0);
-			setState(165);
+			setState(141);
 			match(END);
 			}
 		}
@@ -1431,15 +1176,15 @@ public class ntsParser extends Parser {
 
 	public final ArgumentContext argument() throws RecognitionException {
 		ArgumentContext _localctx = new ArgumentContext(_ctx, getState());
-		enterRule(_localctx, 42, RULE_argument);
+		enterRule(_localctx, 30, RULE_argument);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(167);
+			setState(143);
 			((ArgumentContext)_localctx).name = match(IDENTIFIER);
-			setState(168);
+			setState(144);
 			match(ASSIGN);
-			setState(169);
+			setState(145);
 			((ArgumentContext)_localctx).value = rval();
 			}
 		}
@@ -1477,11 +1222,11 @@ public class ntsParser extends Parser {
 
 	public final NewlineContext newline() throws RecognitionException {
 		NewlineContext _localctx = new NewlineContext(_ctx, getState());
-		enterRule(_localctx, 44, RULE_newline);
+		enterRule(_localctx, 32, RULE_newline);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(171);
+			setState(147);
 			match(CRLF);
 			}
 		}
@@ -1519,11 +1264,11 @@ public class ntsParser extends Parser {
 
 	public final Type_literalContext type_literal() throws RecognitionException {
 		Type_literalContext _localctx = new Type_literalContext(_ctx, getState());
-		enterRule(_localctx, 46, RULE_type_literal);
+		enterRule(_localctx, 34, RULE_type_literal);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(173);
+			setState(149);
 			match(LITERAL);
 			}
 		}
@@ -1561,11 +1306,11 @@ public class ntsParser extends Parser {
 
 	public final Type_integerContext type_integer() throws RecognitionException {
 		Type_integerContext _localctx = new Type_integerContext(_ctx, getState());
-		enterRule(_localctx, 48, RULE_type_integer);
+		enterRule(_localctx, 36, RULE_type_integer);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(175);
+			setState(151);
 			match(INT);
 			}
 		}
@@ -1604,12 +1349,12 @@ public class ntsParser extends Parser {
 
 	public final Type_boolContext type_bool() throws RecognitionException {
 		Type_boolContext _localctx = new Type_boolContext(_ctx, getState());
-		enterRule(_localctx, 50, RULE_type_bool);
+		enterRule(_localctx, 38, RULE_type_bool);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(177);
+			setState(153);
 			_la = _input.LA(1);
 			if ( !(_la==TRUE || _la==FALSE) ) {
 			_errHandler.recoverInline(this);
@@ -1664,18 +1409,18 @@ public class ntsParser extends Parser {
 		int _parentState = getState();
 		TerminatorContext _localctx = new TerminatorContext(_ctx, _parentState);
 		TerminatorContext _prevctx = _localctx;
-		int _startState = 52;
-		enterRecursionRule(_localctx, 52, RULE_terminator, _p);
+		int _startState = 40;
+		enterRecursionRule(_localctx, 40, RULE_terminator, _p);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
 			{
-			setState(180);
+			setState(156);
 			newline();
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(186);
+			setState(162);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,10,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -1686,14 +1431,14 @@ public class ntsParser extends Parser {
 					{
 					_localctx = new TerminatorContext(_parentctx, _parentState);
 					pushNewRecursionContext(_localctx, _startState, RULE_terminator);
-					setState(182);
+					setState(158);
 					if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-					setState(183);
+					setState(159);
 					newline();
 					}
 					} 
 				}
-				setState(188);
+				setState(164);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,10,_ctx);
 			}
@@ -1714,7 +1459,7 @@ public class ntsParser extends Parser {
 		switch (ruleIndex) {
 		case 1:
 			return statement_list_sempred((Statement_listContext)_localctx, predIndex);
-		case 26:
+		case 20:
 			return terminator_sempred((TerminatorContext)_localctx, predIndex);
 		}
 		return true;
@@ -1735,61 +1480,51 @@ public class ntsParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\"\u00c0\4\2\t\2\4"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\"\u00a8\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
-		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
-		"\4\32\t\32\4\33\t\33\4\34\t\34\3\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\5\3A\n"+
-		"\3\3\3\3\3\3\3\3\3\7\3G\n\3\f\3\16\3J\13\3\3\4\3\4\3\4\3\4\3\4\5\4Q\n"+
-		"\4\3\5\3\5\3\5\3\5\5\5W\n\5\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\5\6a\n\6\3"+
-		"\7\3\7\3\b\3\b\3\t\3\t\3\n\3\n\3\13\3\13\3\f\3\f\3\r\3\r\3\r\5\rr\n\r"+
-		"\3\16\3\16\3\17\3\17\3\17\3\17\3\20\3\20\3\20\3\21\3\21\3\21\3\21\3\21"+
-		"\3\21\5\21\u0083\n\21\3\22\3\22\3\22\5\22\u0088\n\22\3\23\3\23\3\23\3"+
-		"\23\3\24\3\24\3\24\5\24\u0091\n\24\3\24\3\24\7\24\u0095\n\24\f\24\16\24"+
-		"\u0098\13\24\3\24\3\24\3\25\3\25\3\25\3\25\3\25\3\25\3\26\3\26\3\26\3"+
-		"\26\3\26\3\26\3\26\3\26\3\27\3\27\3\27\3\27\3\30\3\30\3\31\3\31\3\32\3"+
-		"\32\3\33\3\33\3\34\3\34\3\34\3\34\3\34\7\34\u00bb\n\34\f\34\16\34\u00be"+
-		"\13\34\3\34\2\4\4\66\35\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*"+
-		",.\60\62\64\66\2\5\3\2\27\32\3\2\25\26\3\2\r\16\u00ba\28\3\2\2\2\4@\3"+
-		"\2\2\2\6P\3\2\2\2\bV\3\2\2\2\n`\3\2\2\2\fb\3\2\2\2\16d\3\2\2\2\20f\3\2"+
-		"\2\2\22h\3\2\2\2\24j\3\2\2\2\26l\3\2\2\2\30q\3\2\2\2\32s\3\2\2\2\34u\3"+
-		"\2\2\2\36y\3\2\2\2 \u0082\3\2\2\2\"\u0087\3\2\2\2$\u0089\3\2\2\2&\u008d"+
-		"\3\2\2\2(\u009b\3\2\2\2*\u00a1\3\2\2\2,\u00a9\3\2\2\2.\u00ad\3\2\2\2\60"+
-		"\u00af\3\2\2\2\62\u00b1\3\2\2\2\64\u00b3\3\2\2\2\66\u00b5\3\2\2\289\5"+
-		"\4\3\29:\7\2\2\3:\3\3\2\2\2;<\b\3\1\2<=\5\6\4\2=>\5\66\34\2>A\3\2\2\2"+
-		"?A\5\66\34\2@;\3\2\2\2@?\3\2\2\2AH\3\2\2\2BC\f\4\2\2CD\5\6\4\2DE\5\66"+
-		"\34\2EG\3\2\2\2FB\3\2\2\2GJ\3\2\2\2HF\3\2\2\2HI\3\2\2\2I\5\3\2\2\2JH\3"+
-		"\2\2\2KQ\5\34\17\2LQ\5&\24\2MQ\5\36\20\2NQ\5(\25\2OQ\5*\26\2PK\3\2\2\2"+
-		"PL\3\2\2\2PM\3\2\2\2PN\3\2\2\2PO\3\2\2\2Q\7\3\2\2\2RW\5&\24\2SW\5\64\33"+
-		"\2TW\5\32\16\2UW\5\n\6\2VR\3\2\2\2VS\3\2\2\2VT\3\2\2\2VU\3\2\2\2W\t\3"+
-		"\2\2\2XY\5\30\r\2YZ\t\2\2\2Z[\5\30\r\2[a\3\2\2\2\\]\5\30\r\2]^\t\3\2\2"+
-		"^_\5\30\r\2_a\3\2\2\2`X\3\2\2\2`\\\3\2\2\2a\13\3\2\2\2bc\7\30\2\2c\r\3"+
-		"\2\2\2de\7\27\2\2e\17\3\2\2\2fg\7\31\2\2g\21\3\2\2\2hi\7\32\2\2i\23\3"+
-		"\2\2\2jk\7\25\2\2k\25\3\2\2\2lm\7\26\2\2m\27\3\2\2\2nr\5\64\33\2or\5\62"+
-		"\32\2pr\5\32\16\2qn\3\2\2\2qo\3\2\2\2qp\3\2\2\2r\31\3\2\2\2st\7!\2\2t"+
-		"\33\3\2\2\2uv\7!\2\2vw\7\n\2\2wx\5 \21\2x\35\3\2\2\2yz\7\f\2\2z{\5 \21"+
-		"\2{\37\3\2\2\2|\u0083\5\60\31\2}\u0083\5\62\32\2~\u0083\5&\24\2\177\u0083"+
-		"\5$\23\2\u0080\u0083\5\64\33\2\u0081\u0083\5\32\16\2\u0082|\3\2\2\2\u0082"+
-		"}\3\2\2\2\u0082~\3\2\2\2\u0082\177\3\2\2\2\u0082\u0080\3\2\2\2\u0082\u0081"+
-		"\3\2\2\2\u0083!\3\2\2\2\u0084\u0088\3\2\2\2\u0085\u0088\5&\24\2\u0086"+
-		"\u0088\5\32\16\2\u0087\u0084\3\2\2\2\u0087\u0085\3\2\2\2\u0087\u0086\3"+
-		"\2\2\2\u0088#\3\2\2\2\u0089\u008a\7 \2\2\u008a\u008b\7\3\2\2\u008b\u008c"+
-		"\7 \2\2\u008c%\3\2\2\2\u008d\u008e\7 \2\2\u008e\u0090\7\4\2\2\u008f\u0091"+
-		"\5,\27\2\u0090\u008f\3\2\2\2\u0090\u0091\3\2\2\2\u0091\u0096\3\2\2\2\u0092"+
-		"\u0093\7\5\2\2\u0093\u0095\5,\27\2\u0094\u0092\3\2\2\2\u0095\u0098\3\2"+
-		"\2\2\u0096\u0094\3\2\2\2\u0096\u0097\3\2\2\2\u0097\u0099\3\2\2\2\u0098"+
-		"\u0096\3\2\2\2\u0099\u009a\7\6\2\2\u009a\'\3\2\2\2\u009b\u009c\7\33\2"+
-		"\2\u009c\u009d\5\b\5\2\u009d\u009e\5\66\34\2\u009e\u009f\5\4\3\2\u009f"+
-		"\u00a0\7\35\2\2\u00a0)\3\2\2\2\u00a1\u00a2\7\36\2\2\u00a2\u00a3\5\32\16"+
-		"\2\u00a3\u00a4\7\37\2\2\u00a4\u00a5\5\"\22\2\u00a5\u00a6\5\66\34\2\u00a6"+
-		"\u00a7\5\4\3\2\u00a7\u00a8\7\35\2\2\u00a8+\3\2\2\2\u00a9\u00aa\7 \2\2"+
-		"\u00aa\u00ab\7\n\2\2\u00ab\u00ac\5 \21\2\u00ac-\3\2\2\2\u00ad\u00ae\7"+
-		"\13\2\2\u00ae/\3\2\2\2\u00af\u00b0\7\7\2\2\u00b0\61\3\2\2\2\u00b1\u00b2"+
-		"\7\"\2\2\u00b2\63\3\2\2\2\u00b3\u00b4\t\4\2\2\u00b4\65\3\2\2\2\u00b5\u00b6"+
-		"\b\34\1\2\u00b6\u00b7\5.\30\2\u00b7\u00bc\3\2\2\2\u00b8\u00b9\f\4\2\2"+
-		"\u00b9\u00bb\5.\30\2\u00ba\u00b8\3\2\2\2\u00bb\u00be\3\2\2\2\u00bc\u00ba"+
-		"\3\2\2\2\u00bc\u00bd\3\2\2\2\u00bd\67\3\2\2\2\u00be\u00bc\3\2\2\2\r@H"+
-		"PV`q\u0082\u0087\u0090\u0096\u00bc";
+		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\3\2\3\2\3\2\3\3\3\3\3\3\3\3\3"+
+		"\3\5\3\65\n\3\3\3\3\3\3\3\3\3\7\3;\n\3\f\3\16\3>\13\3\3\4\3\4\3\4\3\4"+
+		"\3\4\5\4E\n\4\3\5\3\5\3\5\3\5\5\5K\n\5\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6"+
+		"\5\6U\n\6\3\7\3\7\3\7\5\7Z\n\7\3\b\3\b\3\t\3\t\3\t\3\t\3\n\3\n\3\n\3\13"+
+		"\3\13\3\13\3\13\3\13\3\13\5\13k\n\13\3\f\3\f\3\f\5\fp\n\f\3\r\3\r\3\r"+
+		"\3\r\3\16\3\16\3\16\5\16y\n\16\3\16\3\16\7\16}\n\16\f\16\16\16\u0080\13"+
+		"\16\3\16\3\16\3\17\3\17\3\17\3\17\3\17\3\17\3\20\3\20\3\20\3\20\3\20\3"+
+		"\20\3\20\3\20\3\21\3\21\3\21\3\21\3\22\3\22\3\23\3\23\3\24\3\24\3\25\3"+
+		"\25\3\26\3\26\3\26\3\26\3\26\7\26\u00a3\n\26\f\26\16\26\u00a6\13\26\3"+
+		"\26\2\4\4*\27\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*\2\5\3\2\27"+
+		"\32\3\2\25\26\3\2\r\16\u00a8\2,\3\2\2\2\4\64\3\2\2\2\6D\3\2\2\2\bJ\3\2"+
+		"\2\2\nT\3\2\2\2\fY\3\2\2\2\16[\3\2\2\2\20]\3\2\2\2\22a\3\2\2\2\24j\3\2"+
+		"\2\2\26o\3\2\2\2\30q\3\2\2\2\32u\3\2\2\2\34\u0083\3\2\2\2\36\u0089\3\2"+
+		"\2\2 \u0091\3\2\2\2\"\u0095\3\2\2\2$\u0097\3\2\2\2&\u0099\3\2\2\2(\u009b"+
+		"\3\2\2\2*\u009d\3\2\2\2,-\5\4\3\2-.\7\2\2\3.\3\3\2\2\2/\60\b\3\1\2\60"+
+		"\61\5\6\4\2\61\62\5*\26\2\62\65\3\2\2\2\63\65\5*\26\2\64/\3\2\2\2\64\63"+
+		"\3\2\2\2\65<\3\2\2\2\66\67\f\4\2\2\678\5\6\4\289\5*\26\29;\3\2\2\2:\66"+
+		"\3\2\2\2;>\3\2\2\2<:\3\2\2\2<=\3\2\2\2=\5\3\2\2\2><\3\2\2\2?E\5\20\t\2"+
+		"@E\5\32\16\2AE\5\22\n\2BE\5\34\17\2CE\5\36\20\2D?\3\2\2\2D@\3\2\2\2DA"+
+		"\3\2\2\2DB\3\2\2\2DC\3\2\2\2E\7\3\2\2\2FK\5\32\16\2GK\5(\25\2HK\5\16\b"+
+		"\2IK\5\n\6\2JF\3\2\2\2JG\3\2\2\2JH\3\2\2\2JI\3\2\2\2K\t\3\2\2\2LM\5\f"+
+		"\7\2MN\t\2\2\2NO\5\f\7\2OU\3\2\2\2PQ\5\f\7\2QR\t\3\2\2RS\5\f\7\2SU\3\2"+
+		"\2\2TL\3\2\2\2TP\3\2\2\2U\13\3\2\2\2VZ\5(\25\2WZ\5&\24\2XZ\5\16\b\2YV"+
+		"\3\2\2\2YW\3\2\2\2YX\3\2\2\2Z\r\3\2\2\2[\\\7!\2\2\\\17\3\2\2\2]^\7!\2"+
+		"\2^_\7\n\2\2_`\5\24\13\2`\21\3\2\2\2ab\7\f\2\2bc\5\24\13\2c\23\3\2\2\2"+
+		"dk\5$\23\2ek\5&\24\2fk\5\32\16\2gk\5\30\r\2hk\5(\25\2ik\5\16\b\2jd\3\2"+
+		"\2\2je\3\2\2\2jf\3\2\2\2jg\3\2\2\2jh\3\2\2\2ji\3\2\2\2k\25\3\2\2\2lp\3"+
+		"\2\2\2mp\5\32\16\2np\5\16\b\2ol\3\2\2\2om\3\2\2\2on\3\2\2\2p\27\3\2\2"+
+		"\2qr\7 \2\2rs\7\3\2\2st\7 \2\2t\31\3\2\2\2uv\7 \2\2vx\7\4\2\2wy\5 \21"+
+		"\2xw\3\2\2\2xy\3\2\2\2y~\3\2\2\2z{\7\5\2\2{}\5 \21\2|z\3\2\2\2}\u0080"+
+		"\3\2\2\2~|\3\2\2\2~\177\3\2\2\2\177\u0081\3\2\2\2\u0080~\3\2\2\2\u0081"+
+		"\u0082\7\6\2\2\u0082\33\3\2\2\2\u0083\u0084\7\33\2\2\u0084\u0085\5\b\5"+
+		"\2\u0085\u0086\5*\26\2\u0086\u0087\5\4\3\2\u0087\u0088\7\35\2\2\u0088"+
+		"\35\3\2\2\2\u0089\u008a\7\36\2\2\u008a\u008b\5\16\b\2\u008b\u008c\7\37"+
+		"\2\2\u008c\u008d\5\26\f\2\u008d\u008e\5*\26\2\u008e\u008f\5\4\3\2\u008f"+
+		"\u0090\7\35\2\2\u0090\37\3\2\2\2\u0091\u0092\7 \2\2\u0092\u0093\7\n\2"+
+		"\2\u0093\u0094\5\24\13\2\u0094!\3\2\2\2\u0095\u0096\7\13\2\2\u0096#\3"+
+		"\2\2\2\u0097\u0098\7\7\2\2\u0098%\3\2\2\2\u0099\u009a\7\"\2\2\u009a\'"+
+		"\3\2\2\2\u009b\u009c\t\4\2\2\u009c)\3\2\2\2\u009d\u009e\b\26\1\2\u009e"+
+		"\u009f\5\"\22\2\u009f\u00a4\3\2\2\2\u00a0\u00a1\f\4\2\2\u00a1\u00a3\5"+
+		"\"\22\2\u00a2\u00a0\3\2\2\2\u00a3\u00a6\3\2\2\2\u00a4\u00a2\3\2\2\2\u00a4"+
+		"\u00a5\3\2\2\2\u00a5+\3\2\2\2\u00a6\u00a4\3\2\2\2\r\64<DJTYjox~\u00a4";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
