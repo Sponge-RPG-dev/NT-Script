@@ -54,7 +54,7 @@ public class Tests {
           FOREACH @entity IN @x
              print{val=@entity}
           END
-          
+           
           print{val="POP NEXT"}
           list{size=50}
           
@@ -74,7 +74,12 @@ public class Tests {
             print{val="@int <= 70000"}
           END
           
-          @lesser = @int <= 70000;
+          @lesser = @int <= 70000
+          
+          @function = fn @int, @lesser
+            print{val=@int}
+          END
+                  
           
           RETURN Result.OK
         """;
@@ -109,7 +114,7 @@ public class Tests {
 
 
                             StackManipulation.Size size = new StackManipulation.Compound(
-                                    visitor.getImpl()
+                                    visitor.getImpl().getScopes().iterator().next().impl
                             ).apply(methodVisitor, implementationContext);
 
                             return new ByteCodeAppender.Size(size.getMaximalSize(), instrumentedMethod.getStackSize());

@@ -16,4 +16,5 @@ public class L {
     public Iterable c(@NamedParam("size") int q) {
         return IntStream.range(0, q).mapToObj(a->UUID.randomUUID()).collect(Collectors.toList());
     }
+
 }

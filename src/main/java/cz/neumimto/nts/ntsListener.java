@@ -99,6 +99,26 @@ public interface ntsListener extends ParseTreeListener {
 	 */
 	void exitReturn_statement(ntsParser.Return_statementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ntsParser#lambda}.
+	 * @param ctx the parse tree
+	 */
+	void enterLambda(ntsParser.LambdaContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#lambda}.
+	 * @param ctx the parse tree
+	 */
+	void exitLambda(ntsParser.LambdaContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ntsParser#assignment_values}.
+	 * @param ctx the parse tree
+	 */
+	void enterAssignment_values(ntsParser.Assignment_valuesContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#assignment_values}.
+	 * @param ctx the parse tree
+	 */
+	void exitAssignment_values(ntsParser.Assignment_valuesContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ntsParser#rval}.
 	 * @param ctx the parse tree
 	 */

@@ -1,8 +1,8 @@
 package cz.neumimto.nts;
 
-import cz.neumimto.nts.annotations.ScriptMeta;
 import cz.neumimto.nts.bytecode.Variable;
 import net.bytebuddy.dynamic.scaffold.InstrumentedType;
+import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
 import java.lang.reflect.Method;
@@ -11,17 +11,20 @@ import java.util.*;
 import static cz.neumimto.nts.annotations.ScriptMeta.*;
 
 public class ScriptContext {
-    private Scope rootSccpe;
-    private Set<Scope> subScopes = new HashSet<>();
-
+    private List<Scope> scopes = new ArrayList<>();
+    int currentScopeIdx = 0;
     private final Collection<Object> mechanics;
     private final Set<Class<?>> enums;
     private InstrumentedType insnType;
 
     public ScriptContext(HashMap<String, Variable> variables, Collection<Object> mechanics, Set<Class<?>> enums) {
-        this.rootSccpe = new Scope(variables);
+        this.scopes.add(new Scope(variables, Collections.emptyList()));
         this.mechanics = mechanics;
         this.enums = enums;
+    }
+
+    public List<Scope> getScopes() {
+        return scopes;
     }
 
     public Method findHandler(Object mechanic, String functionName) {
@@ -57,23 +60,31 @@ public class ScriptContext {
     }
 
 
-    public Optional<Variable> getVariable(String variable) {
-        return Optional.ofNullable(rootSccpe.variables.get(variable));
+    public Scope currentScope() {
+        return scopes.get(currentScopeIdx);
     }
 
-    public Variable createNewVariable(String variable, ntsParser.RvalContext type) {
-        var var = new Variable(rootSccpe.getNextVariableOffset(), getRalReturnType(type));
-        rootSccpe.variables.put(variable, var);
+    public Optional<Variable> getVariable(String variable) {
+        return Optional.ofNullable(currentScope().findVariable(variable));
+    }
+
+    public Variable createNewVariable(String variable, ntsParser.Assignment_valuesContext type) {
+        var var = new Variable(currentScope().getNextVariableOffset(), getRalReturnType(type), getRalRuntimeType(type));
+        currentScope().variables.put(variable, var);
         return var;
     }
 
     public Variable createNewVariable(String variable) {
-        var var = new Variable(rootSccpe.getNextVariableOffset(), MethodVariableAccess.REFERENCE);
-        rootSccpe.variables.put(variable, var);
+        var var = new Variable(currentScope().getNextVariableOffset(), MethodVariableAccess.REFERENCE, null);
+        currentScope().variables.put(variable, var);
         return var;
     }
 
-    protected MethodVariableAccess getRalReturnType(ntsParser.RvalContext rval) {
+    protected MethodVariableAccess getRalReturnType(ntsParser.Assignment_valuesContext val) {
+        if (val.lambda() != null) {
+            return MethodVariableAccess.REFERENCE;
+        }
+        ntsParser.RvalContext rval = val.rval();
         if (rval.type_literal() != null) {
             return MethodVariableAccess.REFERENCE;
         } else if (rval.type_integer() != null) {
@@ -82,11 +93,32 @@ public class ScriptContext {
             return MethodVariableAccess.REFERENCE;
         } else if (rval.type_bool() != null) {
             return MethodVariableAccess.INTEGER;
+        } else if (rval.type_comparison() != null) {
+            return MethodVariableAccess.INTEGER;
         }
         throw new RuntimeException("Unknown type " + rval.getText());
     }
 
-
+    private Class getRalRuntimeType(ntsParser.Assignment_valuesContext val) {
+        if (val.lambda() != null) {
+            return Runnable.class;
+        }
+        ntsParser.RvalContext rval = val.rval();
+        if (rval.type_literal() != null) {
+            return String.class;
+        } else if (rval.type_integer() != null) {
+            return int.class;
+        } else if (rval.function_call() != null) {
+            return null;
+        } else if (rval.type_bool() != null) {
+            return boolean.class;
+        } else if (rval.variable_reference() != null) {
+            return currentScope().findVariable(rval.getText()).getRuntimeType();
+        } else if (rval.type_comparison() != null) {
+            return int.class;
+        }
+        throw new RuntimeException("Unknown type " + rval.getText());
+    }
 
     public Enum getEnumValue(String type, String value) {
         for (Class anEnum : enums) {
@@ -103,5 +135,20 @@ public class ScriptContext {
 
     public InstrumentedType getInsnType() {
         return insnType;
+    }
+
+
+    public void endScope() {
+        currentScopeIdx--;
+    }
+
+    public void createNewScopeWithVars(Map<String, Variable> fnVars) {
+        currentScopeIdx++;
+        Map<String, Variable> fixedOffsets = new HashMap<>();
+        for (Map.Entry<String, Variable> e : fnVars.entrySet()) {
+            fixedOffsets.put(e.getKey(), e.getValue().copyWithNewOffset(fixedOffsets.size() + 1)); //(0 THIS)
+        }
+        scopes.add(new Scope(fixedOffsets, Collections.emptyList()));
+
     }
 }

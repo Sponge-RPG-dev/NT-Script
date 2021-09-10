@@ -38,9 +38,15 @@ comparable_expr : type_bool
 
 variable_reference : variable=VARIABLE_IDENTIFIER ;
 
-assignment_statement : name=VARIABLE_IDENTIFIER '=' value=rval ;
+assignment_statement : name=VARIABLE_IDENTIFIER '=' value=assignment_values ;
 
 return_statement	:	RETURN value=rval	;
+
+lambda : FUNCTION vars=variable_reference* terminator statement_list END ;
+
+assignment_values : rval
+                  | lambda
+                  ;
 
 rval : type_literal
      | type_integer
@@ -115,6 +121,7 @@ ELSE : E L S E;
 END : E N D;
 FOREACH: F O R E A C H;
 IN: I N;
+FUNCTION: ( F N | F U N C T I O N );
 
 IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]*;
 VARIABLE_IDENTIFIER : '@' IDENTIFIER;
