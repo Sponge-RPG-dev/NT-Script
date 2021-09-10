@@ -1,28 +1,6 @@
 package cz.neumimto.nts;
 
-import cz.neumimto.nts.bytecode.VisitorImpl;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.asm.AsmVisitorWrapper;
-import net.bytebuddy.description.field.FieldDescription;
-import net.bytebuddy.description.field.FieldList;
-import net.bytebuddy.description.method.MethodList;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.dynamic.scaffold.InstrumentedType;
-import net.bytebuddy.implementation.Implementation;
-import net.bytebuddy.implementation.bytecode.ByteCodeAppender;
-import net.bytebuddy.implementation.bytecode.StackManipulation;
-import net.bytebuddy.jar.asm.ClassWriter;
-import net.bytebuddy.pool.TypePool;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.List;
 
 public class Tests {
 
@@ -30,8 +8,12 @@ public class Tests {
         OK
     }
 
-    @Test
-    public void test() throws IOException, InstantiationException, IllegalAccessException {
+    public interface Test {
+        public Result test();
+    }
+
+    @org.junit.jupiter.api.Test
+    public void test() throws Exception {
        String k = """
           @text = "test"
           @bool_t = t
@@ -76,9 +58,9 @@ public class Tests {
           
           @lesser = @int <= 70000
           
-          @function = fn @int, @lesser
-            print{val=@int}
-          END
+        #  @function = fn @int, @lesser
+        #    print{val=@int}
+        #  END
                   
           
           RETURN Result.OK
@@ -86,50 +68,18 @@ public class Tests {
    // k = """
    //     @param = call{string="xxxx"}
    // """;
-        CharStream charStream = new ANTLRInputStream(k);
-        var lexer = new ntsLexer(charStream);
-        var stream = new CommonTokenStream(lexer);
-        var parser = new ntsParser(stream);
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(Test.class)
+                .implementingMethod(Test.class.getDeclaredMethod("test"))
+                .withEnum(Result.class)
+                .add(List.of(A.class, B.class, C.class, P.class, L.class))
+                .setClassNamePattern("aaa")
+                .build();
 
-        var visitor = new VisitorImpl(new ScriptContext(new HashMap<>(),
-                Set.of(new A(), new B(), new C(), new L(), new P()),
-                Set.of(Result.class)));
-
-
-        var bb = new ByteBuddy()
-                .subclass(Object.class)
-                .name("cz.neumimto.skills.scripts.aaa" )
-                .visit(new EnableFramesComputing())
-                .defineField("A", A.class, Modifier.PUBLIC)
-                .defineField("B", B.class, Modifier.PUBLIC)
-                .defineField("C", C.class, Modifier.PUBLIC)
-                .defineField("P", P.class, Modifier.PUBLIC)
-                .defineField("L", L.class, Modifier.PUBLIC)
-                .defineMethod("test", Result.class, Modifier.PUBLIC)
-                .intercept(new Implementation() {
-                    @Override
-                    public ByteCodeAppender appender(Target implementationTarget) {
-                        return (methodVisitor, implementationContext, instrumentedMethod) -> {
-                            visitor.visit(parser.script());
-
-
-                            StackManipulation.Size size = new StackManipulation.Compound(
-                                    visitor.getImpl().getScopes().iterator().next().impl
-                            ).apply(methodVisitor, implementationContext);
-
-                            return new ByteCodeAppender.Size(size.getMaximalSize(), instrumentedMethod.getStackSize());
-                        };
-                    }
-
-                    @Override
-                    public InstrumentedType prepare(InstrumentedType instrumentedType) {
-                        visitor.getScriptContext().setInsnType(instrumentedType);
-                        return instrumentedType;
-                    }
-                }).make();
-        bb.saveIn(new File("/tmp/test/"));
-        Class<?> loaded = bb.load(this.getClass().getClassLoader()).getLoaded();
-        Object o = loaded.newInstance();
+        Class aClass = script.parseScript(k);
+        Object o = aClass.newInstance();
         try {
             o.getClass().getDeclaredField("A").set(o, new A());
             o.getClass().getDeclaredField("B").set(o, new B());
@@ -143,20 +93,4 @@ public class Tests {
 
     }
 
-    static class EnableFramesComputing implements AsmVisitorWrapper {
-        @Override
-        public final int mergeWriter(int flags) {
-            return flags | ClassWriter.COMPUTE_FRAMES;
-        }
-
-        @Override
-        public final int mergeReader(int flags) {
-            return flags | ClassWriter.COMPUTE_FRAMES;
-        }
-
-        @Override
-        public net.bytebuddy.jar.asm.ClassVisitor wrap(TypeDescription instrumentedType, net.bytebuddy.jar.asm.ClassVisitor classVisitor, Implementation.Context implementationContext, TypePool typePool, FieldList<FieldDescription.InDefinedShape> fields, MethodList<?> methods, int writerFlags, int readerFlags) {
-            return classVisitor;
-        }
-    }
 }

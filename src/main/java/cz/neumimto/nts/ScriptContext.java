@@ -1,8 +1,8 @@
 package cz.neumimto.nts;
 
 import cz.neumimto.nts.bytecode.Variable;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.scaffold.InstrumentedType;
-import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
 import java.lang.reflect.Method;
@@ -15,7 +15,7 @@ public class ScriptContext {
     int currentScopeIdx = 0;
     private final Collection<Object> mechanics;
     private final Set<Class<?>> enums;
-    private InstrumentedType insnType;
+    private TypeDescription insnType;
 
     public ScriptContext(HashMap<String, Variable> variables, Collection<Object> mechanics, Set<Class<?>> enums) {
         this.scopes.add(new Scope(variables, Collections.emptyList()));
@@ -27,7 +27,7 @@ public class ScriptContext {
         return scopes;
     }
 
-    public Method findHandler(Object mechanic, String functionName) {
+    public static Method findHandler(Object mechanic, String functionName) {
         Class<?> mClass = mechanic.getClass();
         String rootVal = mClass.isAnnotationPresent(Function.class) ? mClass.getAnnotation(Function.class).value() : "";
         for (Method declaredMethod : mClass.getDeclaredMethods()) {
@@ -42,6 +42,11 @@ public class ScriptContext {
     }
 
     public Object findMechanic(String functionName) {
+        return findMechanic(functionName, this.mechanics);
+    }
+
+
+    public static Object findMechanic(String functionName, Collection<Object> mechanics) {
         String rootVal = "";
         for (Object mechanic : mechanics) {
             if (mechanic.getClass().isAnnotationPresent(Function.class)) {
@@ -54,11 +59,9 @@ public class ScriptContext {
                 findHandler(mechanic, functionName);
                 return mechanic;
             } catch (RuntimeException e) {}
-
         }
         throw new RuntimeException("Unknown mechanic " + functionName);
     }
-
 
     public Scope currentScope() {
         return scopes.get(currentScopeIdx);
@@ -129,11 +132,11 @@ public class ScriptContext {
         throw new RuntimeException("Unknown enum value " + type + "." + value);
     }
 
-    public void setInsnType(InstrumentedType insnType) {
+    public void setInsnType(TypeDescription insnType) {
         this.insnType = insnType;
     }
 
-    public InstrumentedType getInsnType() {
+    public TypeDescription getInsnType() {
         return insnType;
     }
 

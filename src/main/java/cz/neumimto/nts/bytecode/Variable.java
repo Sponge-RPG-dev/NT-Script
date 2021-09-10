@@ -1,8 +1,6 @@
 package cz.neumimto.nts.bytecode;
 
-import cz.neumimto.nts.ntsParser;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
-import net.bytebuddy.implementation.bytecode.constant.IntegerConstant;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
 public class Variable implements Comparable<Variable> {

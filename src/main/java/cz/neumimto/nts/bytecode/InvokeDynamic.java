@@ -24,23 +24,24 @@ public class InvokeDynamic implements StackManipulation {
 
     @Override
     public Size apply(MethodVisitor methodVisitor, Implementation.Context implementationContext) {
-        String descriptor = "(%s)Ljava/lang/Runnable;";
-        String k = ctx.localVariables().values().stream().map(a-> new TypeDescription.ForLoadedType(a.aClass).getDescriptor()).collect(Collectors.joining());
-        descriptor = descriptor.replaceAll("%s",ctx.thisType().getDescriptor() + k);
-
-        methodVisitor.visitInvokeDynamicInsn("run",
-                descriptor,
-                new Handle(Opcodes.H_INVOKESTATIC,
-                        new TypeDescription.ForLoadedType(LambdaMetafactory.class).getInternalName(),
-                        "metafactory",
-                        MethodType.methodType(CallSite.class, MethodHandles.Lookup.class, String.class, MethodType.class, String.class, Object[].class).toMethodDescriptorString(),
-                        false),
-                Type.VOID_TYPE,
-                new Handle(Opcodes.H_INVOKESPECIAL,
-                        this.ctx.thisType().getInternalName(),
-                        methodName,
-                        "("+k+")V",
-                        false),
-                Type.VOID_TYPE);
+       // String descriptor = "(%s)Ljava/lang/Runnable;";
+       // String k = ctx.localVariables().values().stream().map(a-> new TypeDescription.ForLoadedType(a.aClass).getDescriptor()).collect(Collectors.joining());
+       // descriptor = descriptor.replaceAll("%s",ctx.thisType().getDescriptor() + k);
+//
+       // methodVisitor.visitInvokeDynamicInsn("run",
+       //         descriptor,
+       //         new Handle(Opcodes.H_INVOKESTATIC,
+       //                 new TypeDescription.ForLoadedType(LambdaMetafactory.class).getInternalName(),
+       //                 "metafactory",
+       //                 MethodType.methodType(CallSite.class, MethodHandles.Lookup.class, String.class, MethodType.class, String.class, Object[].class).toMethodDescriptorString(),
+       //                 false),
+       //         Type.VOID_TYPE,
+       //         new Handle(Opcodes.H_INVOKESPECIAL,
+       //                 this.ctx.thisType().getInternalName(),
+       //                 methodName,
+       //                 "("+k+")V",
+       //                 false),
+       //         Type.VOID_TYPE);
+        return null;
     }
 }
