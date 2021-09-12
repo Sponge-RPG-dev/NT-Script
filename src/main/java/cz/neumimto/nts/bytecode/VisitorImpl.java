@@ -40,12 +40,11 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     public ScriptContext visitAssignment_statement(ntsParser.Assignment_statementContext ctx) {
         TerminalNode variableIdentifier = ctx.VARIABLE_IDENTIFIER();
         Optional<Variable> var = scriptContext.getVariable(variableIdentifier.getText());
+        visitAssignment_values(ctx.assignment_values());
         if (var.isPresent()) {
             Variable variable = var.get();
             addInsn(variable.store());
         } else {
-            var value = ctx.assignment_values();
-            visitAssignment_values(value);
             Variable variable = scriptContext.createNewVariable(variableIdentifier.getText(), ctx.assignment_values());
             addInsn(variable.store());
         }

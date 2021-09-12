@@ -7,41 +7,33 @@ import cz.neumimto.nts.bytecode.Variable;
 import cz.neumimto.nts.bytecode.VisitorImpl;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.asm.AsmVisitorWrapper;
-import net.bytebuddy.description.NamedElement;
-import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.field.FieldList;
-import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.method.MethodList;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.scaffold.InstrumentedType;
 import net.bytebuddy.implementation.Implementation;
-import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bytecode.ByteCodeAppender;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import net.bytebuddy.jar.asm.ClassVisitor;
 import net.bytebuddy.jar.asm.ClassWriter;
 import net.bytebuddy.jar.asm.Opcodes;
-import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.pool.TypePool;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import javax.xml.transform.Result;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -153,7 +145,7 @@ public class NTScript {
 
         List<Scope> scopes = visitor.getImpl().getScopes();
 
-        for (int i = scopes.size(); i > 1; i--) {
+        for (int i = scopes.size()-1; i > 1; i--) {
             Scope scope = scopes.get(i);
 
             bb = bb.defineMethod("lambda$"+i+"$a", void.class, Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC)

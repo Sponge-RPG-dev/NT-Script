@@ -33,6 +33,9 @@ public class Tests {
               @int2 = 5000
           END
           
+          @text="re-assigment"
+          print{val=@text}
+          
           IF @bool_f
               @int3=700000
           END
@@ -63,7 +66,7 @@ public class Tests {
           
           @lesser = @int <= 70000
           
-        #  @function = fn @int, @lesser
+        #  @function = fn @int @lesser
         #    print{val=@int}
         #  END
                   
