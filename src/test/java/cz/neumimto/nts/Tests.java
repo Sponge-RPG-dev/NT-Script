@@ -1,5 +1,7 @@
 package cz.neumimto.nts;
 
+import cz.neumimto.nts.annotations.ScriptMeta;
+
 import java.util.List;
 
 public class Tests {
@@ -8,8 +10,11 @@ public class Tests {
         OK
     }
 
-    public interface Test {
-        public Result test();
+    public static abstract class Test {
+        @ScriptMeta.ScriptTarget
+        public Result test(){
+            return null;
+        };
     }
 
     @org.junit.jupiter.api.Test
@@ -72,9 +77,8 @@ public class Tests {
                 .package_("cz.neumimto.test")
                 .debugOutput("/tmp/test")
                 .implementingType(Test.class)
-                .implementingMethod(Test.class.getDeclaredMethod("test"))
                 .withEnum(Result.class)
-                .add(List.of(A.class, B.class, C.class, P.class, L.class))
+                .add(List.of(new A(), new B(), new C(), new L(), new MP(), new P()))
                 .setClassNamePattern("aaa")
                 .build();
 

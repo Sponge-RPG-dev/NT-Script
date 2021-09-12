@@ -7,6 +7,8 @@ import cz.neumimto.nts.bytecode.Variable;
 import cz.neumimto.nts.bytecode.VisitorImpl;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.asm.AsmVisitorWrapper;
+import net.bytebuddy.description.NamedElement;
+import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.field.FieldList;
 import net.bytebuddy.description.method.MethodDescription;
@@ -15,17 +17,21 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.scaffold.InstrumentedType;
 import net.bytebuddy.implementation.Implementation;
+import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bytecode.ByteCodeAppender;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import net.bytebuddy.jar.asm.ClassVisitor;
 import net.bytebuddy.jar.asm.ClassWriter;
 import net.bytebuddy.jar.asm.Opcodes;
+import net.bytebuddy.matcher.ElementMatcher;
+import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.pool.TypePool;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import javax.xml.transform.Result;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,6 +44,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
 public class NTScript {
@@ -45,7 +52,6 @@ public class NTScript {
 
     private final Set<Object> fns;
     private final Class<?> implementingType;
-    private final Method implementingMethod;
     private final String packagee;
     private String classNamePattern;
     private Set<Class<?>> enums;
@@ -56,7 +62,6 @@ public class NTScript {
 
     private NTScript(Set<Object> fns,
                      Class<?> implementingType,
-                     Method implementingMethod,
                      String packagee,
                      String classNamePattern,
                      Set<Class<?>> enums,
@@ -65,7 +70,6 @@ public class NTScript {
                      String debugOutput) {
         this.fns = fns;
         this.implementingType = implementingType;
-        this.implementingMethod = implementingMethod;
         this.packagee = packagee;
         this.classNamePattern = classNamePattern;
         this.enums = enums;
@@ -82,16 +86,24 @@ public class NTScript {
         var parser = new ntsParser(stream);
 
         var fnVisitor = new FnVisitor();
-        fnVisitor.visit(parser.script());
+        ntsParser.ScriptContext script = parser.script();
+        fnVisitor.visit(script);
 
         List<String> functions = fnVisitor.getFunctions();
 
         Set<Object> requiredFns = findRequiredFns(functions);
 
 
-        var bb = new ByteBuddy()
-                .subclass(implementingType)
-                .name(packagee + "" + classNamePattern + generated)
+        ByteBuddy byteBuddy = new ByteBuddy();
+
+        DynamicType.Builder<?> bb = null;
+        if (implementingType.isInterface()) {
+            bb = byteBuddy.subclass(Object.class).implement(implementingType);
+        } else {
+            bb = byteBuddy.subclass(implementingType);
+        }
+
+        bb = bb.name(packagee + "" + classNamePattern + generated)
                 .visit(new AsmVisitorWrapper() {
                     @Override
                     public int mergeWriter(int flags) {
@@ -112,7 +124,8 @@ public class NTScript {
         if (classAnnotations != null) {
             for (Annotation classAnnotation : classAnnotations) {
                 bb = bb.annotateType(classAnnotation);
-            }}
+            }
+        }
 
 
         generated++;
@@ -126,7 +139,7 @@ public class NTScript {
                     dbf = dbfv.annotateField(fieldAnnotation);
                 }
             }
-            bb = dbf;
+            bb = dbf == null ? dbfv : dbf;
         }
 
         var visitor = new VisitorImpl(new ScriptContext(
@@ -136,13 +149,14 @@ public class NTScript {
 
 
         visitor.getScriptContext().setInsnType(bb.toTypeDescription());
-        visitor.visit(parser.script());
+        visitor.visit(script);
 
         List<Scope> scopes = visitor.getImpl().getScopes();
+
         for (int i = scopes.size(); i > 1; i--) {
             Scope scope = scopes.get(i);
 
-            bb = bb.defineMethod("test", void.class, Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC)
+            bb = bb.defineMethod("lambda$"+i+"$a", void.class, Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC)
                     .intercept(new Implementation() {
                         @Override
                         public ByteCodeAppender appender(Target implementationTarget) {
@@ -164,25 +178,9 @@ public class NTScript {
             visitor.getScriptContext().setInsnType(bb.toTypeDescription());
         }
 
+        bb = bb.method(ElementMatchers.isAnnotatedWith(ScriptMeta.ScriptTarget.class))
+                .intercept(getImplementation(visitor));
 
-        bb = bb.define(implementingMethod).intercept(new Implementation() {
-            @Override
-            public ByteCodeAppender appender(Target implementationTarget) {
-                return (methodVisitor, implementationContext, instrumentedMethod) -> {
-
-                    StackManipulation.Size size = new StackManipulation.Compound(
-                            visitor.getImpl().getScopes().iterator().next().impl
-                    ).apply(methodVisitor, implementationContext);
-
-                    return new ByteCodeAppender.Size(size.getMaximalSize(), instrumentedMethod.getStackSize());
-                };
-            }
-
-            @Override
-            public InstrumentedType prepare(InstrumentedType instrumentedType) {
-                return instrumentedType;
-            }
-        });
 
         var make =  bb.make();
         if (debugOutput != null) {
@@ -195,10 +193,42 @@ public class NTScript {
         return make.load(this.getClass().getClassLoader()).getLoaded();
     }
 
+    private Implementation getImplementation(VisitorImpl visitor) {
+        return new Implementation() {
+            @Override
+            public ByteCodeAppender appender(Target implementationTarget) {
+                return (methodVisitor, implementationContext, instrumentedMethod) -> {
+
+                    List<StackManipulation> impl = visitor.getImpl().getScopes().iterator().next().impl;
+                    List<StackManipulation> list = new ArrayList<>();
+                    list.addAll(impl);
+
+                    StackManipulation.Size size = new StackManipulation.Compound(
+                            impl
+                    ).apply(methodVisitor, implementationContext);
+
+                    return new ByteCodeAppender.Size(size.getMaximalSize(), instrumentedMethod.getStackSize());
+                };
+            }
+
+            @Override
+            public InstrumentedType prepare(InstrumentedType instrumentedType) {
+                return instrumentedType;
+            }
+    };
+    }
+
     private HashMap<String, Variable> getImplementingMethodParams() {
 
         var map = new HashMap<String, Variable>();
-        Parameter[] parameters = implementingMethod.getParameters();
+
+        Optional<Method> first = Stream.of(implementingType.getDeclaredMethods())
+                .filter(m -> m.isAnnotationPresent(ScriptMeta.ScriptTarget.class)).findFirst();
+
+        if (first.isEmpty()) {
+            throw new RuntimeException("No method annotated with @ScriptTarget");
+        }
+        Parameter[] parameters = first.get().getParameters();
 
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
@@ -238,7 +268,7 @@ public class NTScript {
         private Set<Class<?>> enums = new HashSet<>();
 
         private Class implementingType;
-        private Method implementingMethod;
+
         private String packagee;
         private String cnp;
         private Annotation[] fieldAnnotations;
@@ -273,11 +303,6 @@ public class NTScript {
             return this;
         }
 
-        public Builder implementingMethod(Method method) {
-            this.implementingMethod = method;
-            return this;
-        }
-
 
         public Builder setClassNamePattern(String cnp) {
             this.cnp = cnp;
@@ -300,7 +325,7 @@ public class NTScript {
         }
 
         public NTScript build() {
-            return new NTScript(fns, implementingType, implementingMethod,
+            return new NTScript(fns, implementingType,
                     packagee == null ? "no.pkg." : packagee,
                     cnp == null ? System.currentTimeMillis() + "" : cnp,
                     enums,
