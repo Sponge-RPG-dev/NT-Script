@@ -13,20 +13,15 @@ public class DecompileTest {
        // boolean b = false;
        // boolean a = true;
         int ldc = 70000;
-        int b = 55000;
         String o = ";";
 
-        boolean c = ldc < 70000;
 
         Runnable r = () -> {
             int w = ldc;
-            boolean a =c;
             A.a(null,null);
             String k = "inside";
         };
         String w = "after";
-        int k = 0;
-        MP.mp(r);
 
     //   int i = (int) (1 * Math.random());
     //   int b = 30;

@@ -101,6 +101,8 @@ public class ScriptContext {
             return MethodVariableAccess.INTEGER;
         } else if (rval.type_comparison() != null) {
             return MethodVariableAccess.INTEGER;
+        } else if (rval.variable_reference() != null) {
+            return MethodVariableAccess.of(new TypeDescription.ForLoadedType(currentScope().variables.get(rval.getText()).getRuntimeType()));
         }
         throw new RuntimeException("Unknown type " + rval.getText());
     }

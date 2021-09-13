@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -148,7 +149,15 @@ public class NTScript {
         for (int i = scopes.size()-1; i > 0; i--) {
             Scope scope = scopes.get(i);
 
-            bb = bb.defineMethod(Scope.LAMBDA_METHOD_NAME.apply(i), void.class, Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC)
+            List<TypeDescription> params = new ArrayList<>();
+            TypeDescription typeDefinitions = bb.toTypeDescription();
+            params.add(typeDefinitions);
+            for (Variable value : scope.variables.values()) {
+                params.add(new TypeDescription.ForLoadedType(value.getRuntimeType()));
+            }
+
+            bb = bb.defineMethod(Scope.LAMBDA_METHOD_NAME.apply(i - 1), void.class, Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC)
+                    .withParameters(params)
                     .intercept(new Implementation() {
                         @Override
                         public ByteCodeAppender appender(Target implementationTarget) {
