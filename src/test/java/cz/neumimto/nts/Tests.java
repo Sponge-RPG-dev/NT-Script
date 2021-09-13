@@ -66,9 +66,9 @@ public class Tests {
           
           @lesser = @int <= 70000
           
-        #  @function = fn @int @lesser
-        #    print{val=@int}
-        #  END
+          @function = fn @int @lesser
+            print{val="FN"}
+          END
                   
           
           RETURN Result.OK

@@ -4,8 +4,11 @@ import cz.neumimto.nts.bytecode.Variable;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class Scope {
+    public static Function<Integer, String> LAMBDA_METHOD_NAME = i -> "lambda$a$" + i;
+
     public final Map<String, Variable> variables;
 
     private final List<Scope> parentsForVarLookup;

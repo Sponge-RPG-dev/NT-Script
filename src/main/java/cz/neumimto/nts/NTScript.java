@@ -145,10 +145,10 @@ public class NTScript {
 
         List<Scope> scopes = visitor.getImpl().getScopes();
 
-        for (int i = scopes.size()-1; i > 1; i--) {
+        for (int i = scopes.size()-1; i > 0; i--) {
             Scope scope = scopes.get(i);
 
-            bb = bb.defineMethod("lambda$"+i+"$a", void.class, Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC)
+            bb = bb.defineMethod(Scope.LAMBDA_METHOD_NAME.apply(i), void.class, Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC)
                     .intercept(new Implementation() {
                         @Override
                         public ByteCodeAppender appender(Target implementationTarget) {
@@ -191,9 +191,7 @@ public class NTScript {
             public ByteCodeAppender appender(Target implementationTarget) {
                 return (methodVisitor, implementationContext, instrumentedMethod) -> {
 
-                    List<StackManipulation> impl = visitor.getImpl().getScopes().iterator().next().impl;
-                    List<StackManipulation> list = new ArrayList<>();
-                    list.addAll(impl);
+                    List<StackManipulation> impl = visitor.getImpl().getScopes().get(0).impl;
 
                     StackManipulation.Size size = new StackManipulation.Compound(
                             impl

@@ -255,7 +255,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             addInsn(fnVar.load());
         }
 
-        addInsn(new InvokeDynamic());
+        addInsn(new InvokeDynamic(scriptContext, fnVars));
 
         scriptContext.createNewScopeWithVars(fnVars);
         visitChildren(ctx.statement_list());

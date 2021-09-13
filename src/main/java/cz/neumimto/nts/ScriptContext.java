@@ -2,15 +2,18 @@ package cz.neumimto.nts;
 
 import cz.neumimto.nts.bytecode.Variable;
 import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.dynamic.scaffold.InstrumentedType;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static cz.neumimto.nts.annotations.ScriptMeta.*;
+
+import static cz.neumimto.nts.annotations.ScriptMeta.Function;
+import static cz.neumimto.nts.annotations.ScriptMeta.Handler;
+
 
 public class ScriptContext {
+
     private List<Scope> scopes = new ArrayList<>();
     int currentScopeIdx = 0;
     private final Collection<Object> mechanics;
