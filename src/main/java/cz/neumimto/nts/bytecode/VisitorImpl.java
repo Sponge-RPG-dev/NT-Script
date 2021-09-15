@@ -129,6 +129,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             Variable variable1 = variable.get();
             if (Runnable.class.isAssignableFrom(variable1.getRuntimeType())) {
                 try {
+                    addInsn(variable1.load());;
                     Method run = Runnable.class.getDeclaredMethod("run");
                     addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(run)));
                 } catch (NoSuchMethodException e) {
