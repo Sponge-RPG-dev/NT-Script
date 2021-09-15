@@ -66,13 +66,16 @@ public class Tests {
           
           #@lesser = @int <= 70000
           
-          @function = fn @text @int
+          @runnable = fn @text @int
             print{int=@int, val=@text}
           END
+       
+           print{int=@int, val=@text}
+           runnable{w="a"}
           
-       #   @function1 = fn @text
-       #     @k = @text
-       #   END
+      #    @function1 = fn @int
+      #      @k = @int
+      #    END
           
           RETURN Result.OK
         """;

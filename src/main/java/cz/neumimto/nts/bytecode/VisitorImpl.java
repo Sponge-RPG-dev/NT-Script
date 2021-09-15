@@ -124,6 +124,19 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     @Override
     public ScriptContext visitFunction_call(ntsParser.Function_callContext ctx) {
         String functionName = ctx.function_name.getText();
+        Optional<Variable> variable = scriptContext.getVariable("@" + functionName);
+        if(variable.isPresent()) {
+            Variable variable1 = variable.get();
+            if (Runnable.class.isAssignableFrom(variable1.getRuntimeType())) {
+                try {
+                    Method run = Runnable.class.getDeclaredMethod("run");
+                    addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(run)));
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
+                return scriptContext;
+            }
+        }
         Object mechanic = scriptContext.findMechanic(functionName);
 
         addInsn(MethodVariableAccess.loadThis());
