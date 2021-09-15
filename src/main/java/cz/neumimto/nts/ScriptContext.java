@@ -151,6 +151,10 @@ public class ScriptContext {
         this.current = scope.parent;
     }
 
+    public void startScope(Scope scope) {
+        this.current = scope;
+    }
+
     public Scope createNewScopeWithVars(Map<String, Variable> fnVars, Scope currentScope) {
         Map<String, Variable> fixedOffsets = new HashMap<>();
         for (Map.Entry<String, Variable> e : fnVars.entrySet()) {

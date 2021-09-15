@@ -257,6 +257,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
         Scope currentScope = scriptContext.currentScope();
         Scope scope = scriptContext.createNewScopeWithVars(fnVars, currentScope);
+        scriptContext.startScope(scope);
         visitChildren(ctx.statement_list());
         addInsn(MethodReturn.VOID);
         scriptContext.endScope(scope);

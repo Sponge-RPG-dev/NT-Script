@@ -70,9 +70,9 @@ public class Tests {
             print{int=@int, val=@text}
           END
           
-          @function1 = fn @text
-            @k = @text
-          END
+       #   @function1 = fn @text
+       #     @k = @text
+       #   END
           
           RETURN Result.OK
         """;
