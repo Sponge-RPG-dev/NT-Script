@@ -1,5 +1,6 @@
 package cz.neumimto.nts.bytecode;
 
+import cz.neumimto.nts.Scope;
 import cz.neumimto.nts.ScriptContext;
 import cz.neumimto.nts.annotations.ScriptMeta;
 import cz.neumimto.nts.ntsBaseVisitor;
@@ -7,6 +8,7 @@ import cz.neumimto.nts.ntsParser;
 import net.bytebuddy.description.enumeration.EnumerationDescription;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.Removal;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.constant.IntegerConstant;
@@ -18,6 +20,7 @@ import net.bytebuddy.implementation.bytecode.member.MethodReturn;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import net.bytebuddy.jar.asm.Label;
 import net.bytebuddy.matcher.ElementMatchers;
+import net.bytebuddy.utility.JavaConstant;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.lang.reflect.Method;
@@ -41,13 +44,8 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         TerminalNode variableIdentifier = ctx.VARIABLE_IDENTIFIER();
         Optional<Variable> var = scriptContext.getVariable(variableIdentifier.getText());
         visitAssignment_values(ctx.assignment_values());
-        if (var.isPresent()) {
-            Variable variable = var.get();
-            addInsn(variable.store());
-        } else {
-            Variable variable = scriptContext.createNewVariable(variableIdentifier.getText(), ctx.assignment_values());
-            addInsn(variable.store());
-        }
+        Variable variable = var.orElseGet(() -> scriptContext.createNewVariable(variableIdentifier.getText(), ctx.assignment_values()));
+        addInsn(variable.store());
         return scriptContext;
     }
 
@@ -249,7 +247,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             fnVars.put(text, variable.get());
         }
 
-        addInsn(MethodVariableAccess.loadThis());
+        addInsn(MethodVariableAccess.loadThis()); //some kind of jvm magic for syntethic methods
 
         for (Variable fnVar : fnVars.values()) {
             addInsn(fnVar.load());
@@ -257,10 +255,11 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
         addInsn(new InvokeDynamic(scriptContext, fnVars));
 
-        scriptContext.createNewScopeWithVars(fnVars);
+        Scope currentScope = scriptContext.currentScope();
+        Scope scope = scriptContext.createNewScopeWithVars(fnVars, currentScope);
         visitChildren(ctx.statement_list());
         addInsn(MethodReturn.VOID);
-        scriptContext.endScope();
+        scriptContext.endScope(scope);
 
         return scriptContext;
     }

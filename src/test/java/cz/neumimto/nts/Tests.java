@@ -20,8 +20,8 @@ public class Tests {
     @org.junit.jupiter.api.Test
     public void test() throws Exception {
        String k = """
-     #     @text = "test"
-      #    @bool_t = t
+          @text = "test"
+      ##    @bool_t = t
        #   @bool_f = false
           @int = 10000
           
@@ -64,12 +64,15 @@ public class Tests {
      #      print{val="@int <= 70000"}
      #    END
           
-          @lesser = @int <= 70000
+          #@lesser = @int <= 70000
           
-          @function = fn @int @lesser
-            @k = @int
+          @function = fn @text @int
+            print{int=@int, val=@text}
           END
-                  
+          
+          @function1 = fn @text
+            @k = @text
+          END
           
           RETURN Result.OK
         """;
@@ -85,7 +88,7 @@ public class Tests {
                 .setClassNamePattern("aaa")
                 .build();
 
-        Class aClass = script.parseScript(k);
+        Class aClass = script.compile(k);
         Object o = aClass.newInstance();
         try {
          //  o.getClass().getDeclaredField("A").set(o, new A());
@@ -93,7 +96,7 @@ public class Tests {
          //  o.getClass().getDeclaredField("C").set(o, new C());
          //  o.getClass().getDeclaredField("L").set(o, new L());
             o.getClass().getDeclaredField("P").set(o, new P());
-          //  o.getClass().getDeclaredMethod("test").invoke(o);
+            o.getClass().getDeclaredMethod("test").invoke(o);
         } catch (Throwable t) {
             t.printStackTrace();
         }

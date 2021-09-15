@@ -12,14 +12,18 @@ public class Scope {
     public final Map<String, Variable> variables;
 
     private final List<Scope> parentsForVarLookup;
+    public final Scope parent;
 
     public final List<StackManipulation> impl = new ArrayList<>();
 
     private final Set<Variable> parentVarsLookup;
 
-    public Scope(Map<String, Variable> variables, List<Scope> parentsForVarLookup) {
+    public Map<String, Variable> fnVars;
+
+    public Scope(Map<String, Variable> variables, List<Scope> parentsForVarLookup, Scope currentScope) {
         this.variables = variables;
         this.parentsForVarLookup = parentsForVarLookup;
+        this.parent = currentScope;
         this.parentVarsLookup = new TreeSet<>();
     }
 

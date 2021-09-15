@@ -2,26 +2,22 @@ package cz.neumimto.nts;
 
 public class DecompileTest {
 
-    A A;
-    B B;
-    C C;
-    L L;
+    //A A;
+ //   B B;
+ //   C C;
+ //   L L;
     P P;
-    MP MP;
+  //  MP MP;
 
     public Tests.Result a() {
        // boolean b = false;
        // boolean a = true;
-        int ldc = 70000;
-        String o = ";";
+        String a = "A";
+        int c = 2;
+        Runnable r = () ->{
+            P.print(a, c);
+        } ;
 
-
-        Runnable r = () -> {
-            int w = ldc;
-            A.a(null,null);
-            String k = "inside";
-        };
-        String w = "after";
 
     //   int i = (int) (1 * Math.random());
     //   int b = 30;
@@ -34,9 +30,5 @@ public class DecompileTest {
 
 
         return Tests.Result.OK;
-    }
-
-    public boolean someFunc()  {
-        return false;
     }
 }

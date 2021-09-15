@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -40,7 +39,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public class NTScript {
+public class NTScript implements Opcodes {
 
 
     private final Set<Object> fns;
@@ -72,7 +71,7 @@ public class NTScript {
     }
 
 
-    public Class parseScript(String input) {
+    public Class compile(String input) {
         CharStream charStream = new ANTLRInputStream(input);
         var lexer = new ntsLexer(charStream);
         var stream = new CommonTokenStream(lexer);
@@ -151,12 +150,13 @@ public class NTScript {
 
             List<TypeDescription> params = new ArrayList<>();
             TypeDescription typeDefinitions = bb.toTypeDescription();
-            params.add(typeDefinitions);
-            for (Variable value : scope.variables.values()) {
+            //params.add(typeDefinitions);
+            for (Variable value : scope.fnVars.values()) {
                 params.add(new TypeDescription.ForLoadedType(value.getRuntimeType()));
             }
 
-            bb = bb.defineMethod(Scope.LAMBDA_METHOD_NAME.apply(i - 1), void.class, Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC)
+            bb = bb.defineMethod(Scope.LAMBDA_METHOD_NAME.apply(i - 1), void.class,
+                    ACC_PRIVATE | ACC_SYNTHETIC )
                     .withParameters(params)
                     .intercept(new Implementation() {
                         @Override
@@ -181,7 +181,6 @@ public class NTScript {
 
         bb = bb.method(ElementMatchers.isAnnotatedWith(ScriptMeta.ScriptTarget.class))
                 .intercept(getImplementation(visitor));
-
 
         var make =  bb.make();
         if (debugOutput != null) {
@@ -214,7 +213,7 @@ public class NTScript {
             public InstrumentedType prepare(InstrumentedType instrumentedType) {
                 return instrumentedType;
             }
-    };
+        };
     }
 
     private HashMap<String, Variable> getImplementingMethodParams() {
@@ -246,16 +245,16 @@ public class NTScript {
         return functions.stream().map(f->ScriptContext.findMechanic(f, fns)).collect(Collectors.toSet());
     }
 
-    public Class parseScript(FileInputStream fis) throws IOException {
-        return parseScript(new String(fis.readAllBytes()));
+    public Class compile(FileInputStream fis) throws IOException {
+        return compile(new String(fis.readAllBytes()));
     }
 
-    public Class parseScript(File file) throws IOException {
-        return parseScript(file.toPath());
+    public Class compile(File file) throws IOException {
+        return compile(file.toPath());
     }
 
-    public Class parseScript(Path path) throws IOException {
-        return parseScript(new String(Files.readAllBytes(path)));
+    public Class compile(Path path) throws IOException {
+        return compile(new String(Files.readAllBytes(path)));
     }
 
     public static Builder builder() {

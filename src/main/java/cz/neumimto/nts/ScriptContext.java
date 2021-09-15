@@ -15,13 +15,14 @@ import static cz.neumimto.nts.annotations.ScriptMeta.Handler;
 public class ScriptContext {
 
     private List<Scope> scopes = new ArrayList<>();
-    int currentScopeIdx = 0;
+    private Scope current;
     private final Collection<Object> mechanics;
     private final Set<Class<?>> enums;
     private TypeDescription insnType;
 
     public ScriptContext(HashMap<String, Variable> variables, Collection<Object> mechanics, Set<Class<?>> enums) {
-        this.scopes.add(new Scope(variables, Collections.emptyList()));
+        this.scopes.add(new Scope(variables, Collections.emptyList(), null));
+        this.current = scopes.get(0);
         this.mechanics = mechanics;
         this.enums = enums;
     }
@@ -67,7 +68,7 @@ public class ScriptContext {
     }
 
     public Scope currentScope() {
-        return scopes.get(currentScopeIdx);
+        return current;
     }
 
     public Optional<Variable> getVariable(String variable) {
@@ -146,17 +147,18 @@ public class ScriptContext {
     }
 
 
-    public void endScope() {
-        currentScopeIdx--;
+    public void endScope(Scope scope) {
+        this.current = scope.parent;
     }
 
-    public void createNewScopeWithVars(Map<String, Variable> fnVars) {
-        currentScopeIdx++;
+    public Scope createNewScopeWithVars(Map<String, Variable> fnVars, Scope currentScope) {
         Map<String, Variable> fixedOffsets = new HashMap<>();
         for (Map.Entry<String, Variable> e : fnVars.entrySet()) {
             fixedOffsets.put(e.getKey(), e.getValue().copyWithNewOffset(fixedOffsets.size() + 1)); //(0 THIS)
         }
-        scopes.add(new Scope(fixedOffsets, Collections.emptyList()));
-
+        var scope = new Scope(fixedOffsets, Collections.emptyList(), currentScope);
+        scope.fnVars = fnVars;
+        scopes.add(scope);
+        return scope;
     }
 }

@@ -1,20 +1,21 @@
 plugins {
     id 'antlr'
     id 'java'
+    id "com.github.breadmoirai.github-release" version "2.2.12"
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group 'cz.neumimto.nts'
+version '0.0.2'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    antlr "org.antlr:antlr4:4.5" // use ANTLR version 4
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-    implementation 'net.bytebuddy:byte-buddy:1.11.13'
+    antlr 'org.antlr:antlr4:4.9.2' // use ANTLR version 4
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    implementation 'net.bytebuddy:byte-buddy:1.11.15'
 }
 
 test {
@@ -39,4 +40,20 @@ compileJava.source sourceSets.generated.java, sourceSets.main.java
 
 clean{
     delete "generated-src"
+}
+
+setArchivesBaseName("NT-Script")
+
+githubRelease {
+    token = getProperty('github.token')
+
+    owner = 'Sponge-RPG-dev' // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
+    repo = 'NT-Script' // by default this is set to your project name
+    tagName = "v${project.version}"
+    targetCommitish = "master"
+    body = "v${project.version}" // by default this is empty
+    releaseAssets = jar.destinationDirectory.file(getArchivesBaseName()+ "-${project.version}.jar")
+
+    apiEndpoint = "https://api.github.com" // should only change for github enterprise users
+    client // This is the okhttp client used for http requests
 }
