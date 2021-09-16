@@ -19,6 +19,7 @@ public class Scope {
     private final Set<Variable> parentVarsLookup;
 
     public Map<String, Variable> fnVars;
+    public int id;
 
     public Scope(Map<String, Variable> variables, List<Scope> parentsForVarLookup, Scope currentScope) {
         this.variables = variables;

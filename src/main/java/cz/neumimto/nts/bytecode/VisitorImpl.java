@@ -267,10 +267,12 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             addInsn(fnVar.load());
         }
 
-        addInsn(new InvokeDynamic(scriptContext, fnVars));
 
         Scope currentScope = scriptContext.currentScope();
         Scope scope = scriptContext.createNewScopeWithVars(fnVars, currentScope);
+
+        addInsn(new InvokeDynamic(scriptContext, fnVars, scope.id));
+
         scriptContext.startScope(scope);
         visitChildren(ctx.statement_list());
         addInsn(MethodReturn.VOID);

@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class InvokeDynamic implements StackManipulation {
 
     private final Map<String, Variable> fnVars;
+    private int id;
     private ScriptContext scriptContext;
 
     private static Method metaFactory;
@@ -38,9 +39,10 @@ public class InvokeDynamic implements StackManipulation {
         }
     }
 
-    public InvokeDynamic(ScriptContext scriptContext, Map<String, Variable> fnVars) {
+    public InvokeDynamic(ScriptContext scriptContext, Map<String, Variable> fnVars, int id) {
         this.scriptContext = scriptContext;
         this.fnVars = fnVars;
+        this.id = id;
     }
 
     @Override
@@ -51,13 +53,9 @@ public class InvokeDynamic implements StackManipulation {
     @Override
     public Size apply(MethodVisitor methodVisitor, Implementation.Context implementationContext) {// methodVisitor.visitInvokeDynamicInsn("run",
 
-        String k = fnVars.values().stream()
-                .map(a-> new TypeDescription.ForLoadedType(a.getRuntimeType()).getDescriptor())
-                .collect(Collectors.joining());
-
         var method = implementationContext.getInstrumentedType()
                 .getDeclaredMethods()
-                .filter(ElementMatchers.named(Scope.LAMBDA_METHOD_NAME.apply(scriptContext.getScopes().size() - 2)))
+                .filter(ElementMatchers.named(Scope.LAMBDA_METHOD_NAME.apply(id)))
                 .stream().findFirst().get();
 
         var descriptor = method.asSignatureToken().getDescriptor();
@@ -72,7 +70,7 @@ public class InvokeDynamic implements StackManipulation {
                 Type.getType("()V"),
                 new Handle(Opcodes.H_INVOKEVIRTUAL,
                         scriptContext.getInsnType().getInternalName(),
-                        Scope.LAMBDA_METHOD_NAME.apply(scriptContext.getScopes().size() - 2),
+                        Scope.LAMBDA_METHOD_NAME.apply(id),
                         descriptor,
                         false),
                 Type.getType("()V"));

@@ -64,18 +64,17 @@ public class Tests {
      #      print{val="@int <= 70000"}
      #    END
           
-          #@lesser = @int <= 70000
+          @lesser = @int <= 70000
           
           @runnable = fn @text @int
             print{int=@int, val=@text}
           END
        
-           print{int=@int, val=@text}
-           runnable{w="a"}
+          runnable{}
           
-      #    @function1 = fn @int
-      #      @k = @int
-      #    END
+          @function1 = fn
+             print{val="FN NO ARGS"}
+          END
           
           RETURN Result.OK
         """;

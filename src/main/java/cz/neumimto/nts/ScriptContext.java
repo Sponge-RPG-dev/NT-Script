@@ -162,6 +162,7 @@ public class ScriptContext {
         }
         var scope = new Scope(fixedOffsets, Collections.emptyList(), currentScope);
         scope.fnVars = fnVars;
+        scope.id = scopes.size() - 1;
         scopes.add(scope);
         return scope;
     }
