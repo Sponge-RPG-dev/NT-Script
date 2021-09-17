@@ -44,16 +44,16 @@ clean{
 
 setArchivesBaseName("NT-Script")
 
-githubRelease {
-    token = getProperty('github.token')
-
-    owner = 'Sponge-RPG-dev' // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
-    repo = 'NT-Script' // by default this is set to your project name
-    tagName = "v${project.version}"
-    targetCommitish = "master"
-    body = "v${project.version}" // by default this is empty
-    releaseAssets = jar.destinationDirectory.file(getArchivesBaseName()+ "-${project.version}.jar")
-
-    apiEndpoint = "https://api.github.com" // should only change for github enterprise users
-    client // This is the okhttp client used for http requests
-}
+//githubRelease {
+//    token = getProperty('github.token')
+//
+//    owner = 'Sponge-RPG-dev' // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
+//    repo = 'NT-Script' // by default this is set to your project name
+//    tagName = "v${project.version}"
+//    targetCommitish = "master"
+//    body = "v${project.version}" // by default this is empty
+//    releaseAssets = jar.destinationDirectory.file(getArchivesBaseName()+ "-${project.version}.jar")
+//
+//    apiEndpoint = "https://api.github.com" // should only change for github enterprise users
+//    client // This is the okhttp client used for http requests
+//}
