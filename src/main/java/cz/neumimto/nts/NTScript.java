@@ -7,6 +7,7 @@ import cz.neumimto.nts.bytecode.Variable;
 import cz.neumimto.nts.bytecode.VisitorImpl;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.asm.AsmVisitorWrapper;
+import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.field.FieldList;
 import net.bytebuddy.description.method.MethodList;
@@ -47,8 +48,8 @@ public class NTScript implements Opcodes {
     private final String packagee;
     private String classNamePattern;
     private Set<Class<?>> enums;
-    private Annotation[] fieldAnnotations;
-    private Annotation[] classAnnotations;
+    private Class<? extends Annotation>[] fieldAnnotations;
+    private Class<? extends Annotation>[] classAnnotations;
     private String debugOutput;
     private int generated = 0;
 
@@ -57,8 +58,8 @@ public class NTScript implements Opcodes {
                      String packagee,
                      String classNamePattern,
                      Set<Class<?>> enums,
-                     Annotation[] fieldAnnotations,
-                     Annotation[] classAnnotations,
+                     Class<? extends Annotation>[] fieldAnnotations,
+                     Class<? extends Annotation>[] classAnnotations,
                      String debugOutput) {
         this.fns = fns;
         this.implementingType = implementingType;
@@ -114,8 +115,9 @@ public class NTScript implements Opcodes {
                 });
 
         if (classAnnotations != null) {
-            for (Annotation classAnnotation : classAnnotations) {
-                bb = bb.annotateType(classAnnotation);
+            for (Class<? extends Annotation> classAnnotation : classAnnotations) {
+                AnnotationDescription build = AnnotationDescription.Builder.ofType(classAnnotation).build();
+                bb = bb.annotateType(build);
             }
         }
 
@@ -127,8 +129,9 @@ public class NTScript implements Opcodes {
 
             DynamicType.Builder.FieldDefinition.Optional<?> dbf = null;
             if (fieldAnnotations != null) {
-                for (Annotation fieldAnnotation : fieldAnnotations) {
-                    dbf = dbfv.annotateField(fieldAnnotation);
+                for (Class<? extends Annotation> fieldAnnotation : fieldAnnotations) {
+                    AnnotationDescription build = AnnotationDescription.Builder.ofType(fieldAnnotation).build();
+                    dbf = dbfv.annotateField(build);
                 }
             }
             bb = dbf == null ? dbfv : dbf;
@@ -269,8 +272,8 @@ public class NTScript implements Opcodes {
 
         private String packagee;
         private String cnp;
-        private Annotation[] fieldAnnotations;
-        private Annotation[] classAnnotations;
+        private Class<? extends Annotation>[] fieldAnnotations;
+        private Class<? extends Annotation>[] classAnnotations;
         private String debugOutput;
 
         public Builder add(Object o) {
@@ -312,12 +315,12 @@ public class NTScript implements Opcodes {
             return this;
         }
 
-        public Builder fieldAnnotation(Annotation... annotations) {
+        public Builder fieldAnnotation(Class<? extends Annotation>[] annotations) {
             this.fieldAnnotations = annotations;
             return this;
         }
 
-        public Builder classAnnotations(Annotation... annotations) {
+        public Builder classAnnotations(Class<? extends Annotation>[] annotations) {
             this.classAnnotations = annotations;
             return this;
         }
