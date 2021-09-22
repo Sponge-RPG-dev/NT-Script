@@ -5,6 +5,9 @@ plugins {
     id "com.github.breadmoirai.github-release" version "2.2.12"
 }
 
+apply plugin: 'maven-publish'
+
+
 group 'cz.neumimto.nts'
 version '0.0.4'
 
