@@ -94,8 +94,8 @@ public class ScriptContext {
         ntsParser.RvalContext rval = val.rval();
         if (rval.type_literal() != null) {
             return MethodVariableAccess.REFERENCE;
-        } else if (rval.type_integer() != null) {
-            return MethodVariableAccess.INTEGER;
+        } else if (rval.type_double() != null) {
+            return MethodVariableAccess.DOUBLE;
         } else if (rval.function_call() != null) {
             return MethodVariableAccess.REFERENCE;
         } else if (rval.type_bool() != null) {
@@ -115,8 +115,8 @@ public class ScriptContext {
         ntsParser.RvalContext rval = val.rval();
         if (rval.type_literal() != null) {
             return String.class;
-        } else if (rval.type_integer() != null) {
-            return int.class;
+        } else if (rval.type_double() != null) {
+            return double.class;
         } else if (rval.function_call() != null) {
             return null;
         } else if (rval.type_bool() != null) {
@@ -124,7 +124,7 @@ public class ScriptContext {
         } else if (rval.variable_reference() != null) {
             return currentScope().findVariable(rval.getText()).getRuntimeType();
         } else if (rval.type_comparison() != null) {
-            return int.class;
+            return double.class;
         }
         throw new RuntimeException("Unknown type " + rval.getText());
     }

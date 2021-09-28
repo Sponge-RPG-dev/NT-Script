@@ -24,15 +24,16 @@ public interface Branching extends StackManipulation{
             this.opcode = opcode;
         }
 
+        //todo
         public static StackManipulation forToken(String text, Label ifLabel) {
             int opCode = switch (text) {
                 case "<":
-                    yield Opcodes.IF_ICMPGE;
+                    yield Opcodes.DCMPG;
                 case ">":
-                    yield Opcodes.IF_ICMPLE;
+                    yield Opcodes.DCMPL;
                 case ">=":
                 case "=>":
-                    yield Opcodes.IF_ICMPLT;
+                    yield Opcodes.DCMPG;
                 case "<=":
                 case "=<":
                     yield Opcodes.IF_ICMPGT;

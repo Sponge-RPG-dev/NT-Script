@@ -131,11 +131,11 @@ public interface ntsVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitType_literal(ntsParser.Type_literalContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ntsParser#type_integer}.
+	 * Visit a parse tree produced by {@link ntsParser#type_double}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitType_integer(ntsParser.Type_integerContext ctx);
+	T visitType_double(ntsParser.Type_doubleContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ntsParser#type_bool}.
 	 * @param ctx the parse tree

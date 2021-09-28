@@ -22,7 +22,7 @@ public class Tests {
        String k = """
           @text = "test"
       ##    @bool_t = t
-       #   @bool_f = false
+          @bool_f = false
           @int = 10000
           
      #    #C O M M E N T
@@ -34,7 +34,7 @@ public class Tests {
      #    END
      #    
      #    @text="re-assigment"
-     #    print{val=@text}
+     #     print{val=@text}
      #    
      #    IF @bool_f
      #        @int3=700000
@@ -64,10 +64,10 @@ public class Tests {
      #      print{val="@int <= 70000"}
      #    END
           
-          @lesser = @int <= 70000
+     #     @lesser = @int <= 70000
           
-          @runnable = fn @text @int
-            print{int=@int, val=@text}
+          @runnable = fn @text @bool_f @int
+            print{val=@text}
           END
        
           runnable{}

@@ -256,13 +256,13 @@ public class ntsBaseListener implements ntsListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterType_integer(ntsParser.Type_integerContext ctx) { }
+	@Override public void enterType_double(ntsParser.Type_doubleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitType_integer(ntsParser.Type_integerContext ctx) { }
+	@Override public void exitType_double(ntsParser.Type_doubleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

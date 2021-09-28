@@ -208,15 +208,15 @@ public interface ntsListener extends ParseTreeListener {
 	 */
 	void exitType_literal(ntsParser.Type_literalContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ntsParser#type_integer}.
+	 * Enter a parse tree produced by {@link ntsParser#type_double}.
 	 * @param ctx the parse tree
 	 */
-	void enterType_integer(ntsParser.Type_integerContext ctx);
+	void enterType_double(ntsParser.Type_doubleContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ntsParser#type_integer}.
+	 * Exit a parse tree produced by {@link ntsParser#type_double}.
 	 * @param ctx the parse tree
 	 */
-	void exitType_integer(ntsParser.Type_integerContext ctx);
+	void exitType_double(ntsParser.Type_doubleContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ntsParser#type_bool}.
 	 * @param ctx the parse tree

@@ -11,9 +11,7 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.Removal;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
-import net.bytebuddy.implementation.bytecode.constant.IntegerConstant;
-import net.bytebuddy.implementation.bytecode.constant.NullConstant;
-import net.bytebuddy.implementation.bytecode.constant.TextConstant;
+import net.bytebuddy.implementation.bytecode.constant.*;
 import net.bytebuddy.implementation.bytecode.member.FieldAccess;
 import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodReturn;
@@ -64,9 +62,9 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     }
 
     @Override
-    public ScriptContext visitType_integer(ntsParser.Type_integerContext ctx) {
+    public ScriptContext visitType_double(ntsParser.Type_doubleContext ctx) {
         String text = ctx.getText();
-        addInsn(IntegerConstant.forValue(Integer.parseInt(text)));
+        addInsn(DoubleConstant.forValue(Double.parseDouble(text)));
         return scriptContext;
     }
 
@@ -102,9 +100,12 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             visitChildren(rtype);
             addInsn(MethodReturn.REFERENCE);
 
-        } else if (rtype.type_integer() != null || rtype.type_bool() != null) {
-            visitChildren(rtype.type_integer());
+        } else if (rtype.type_bool() != null) {
+            visitChildren(rtype.type_bool());
             addInsn(MethodReturn.INTEGER);
+        } else if (rtype.type_double() != null) {
+            visitChildren(rtype.type_double());
+            addInsn(MethodReturn.DOUBLE);
 
         } else {
             addInsn(MethodReturn.VOID);
@@ -148,7 +149,6 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
         addInsn(FieldAccess.forField(field).read());
 
-        List<StackManipulation> argImpl = new ArrayList<>();
         Parameter[] parameters = scriptContext.findHandler(mechanic, functionName).getParameters();
 
         for (Parameter parameter : parameters) {
@@ -160,6 +160,10 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             if (argument == null) {
                 if (parameter.getType() == int.class || parameter.getType() == boolean.class) {
                     addInsn(IntegerConstant.forValue(0));
+                } else if (parameter.getType() == double.class) {
+                    addInsn(DoubleConstant.forValue(0));
+                } else if (parameter.getType() == float.class) {
+                    addInsn(FloatConstant.forValue(0));
                 } else if (Object.class.isAssignableFrom(parameter.getType())) {
                     addInsn(NullConstant.INSTANCE);
                 }

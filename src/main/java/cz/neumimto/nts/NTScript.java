@@ -36,11 +36,16 @@ import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static net.bytebuddy.jar.asm.Opcodes.ACC_PRIVATE;
+import static net.bytebuddy.jar.asm.Opcodes.ACC_SYNTHETIC;
+
 @SuppressWarnings("unchecked")
-public class NTScript implements Opcodes {
+public class NTScript {
 
 
     private final Set<Object> fns;
@@ -52,6 +57,7 @@ public class NTScript implements Opcodes {
     private Class<? extends Annotation>[] classAnnotations;
     private String debugOutput;
     private int generated = 0;
+    private Map<String, String> macros;
 
     private NTScript(Set<Object> fns,
                      Class<?> implementingType,
@@ -60,7 +66,9 @@ public class NTScript implements Opcodes {
                      Set<Class<?>> enums,
                      Class<? extends Annotation>[] fieldAnnotations,
                      Class<? extends Annotation>[] classAnnotations,
-                     String debugOutput) {
+                     String debugOutput,
+                     Map<String, String> macros) {
+        this.macros = macros;
         this.fns = fns;
         this.implementingType = implementingType;
         this.packagee = packagee;
@@ -73,6 +81,23 @@ public class NTScript implements Opcodes {
 
 
     public Class compile(String input) {
+        for (Map.Entry<String, String> en : macros.entrySet()) {
+            Pattern compile = Pattern.compile(en.getKey());
+            Matcher matcher = compile.matcher(input);
+            if (matcher.matches()) {
+                if (matcher.groupCount() == 0) {
+                    input = input.replaceAll(en.getKey(), en.getValue());
+                } else {
+                    int i = 1;
+                    String b = en.getValue();
+                    while (matcher.groupCount() <= i) {
+                        b = b.replaceAll("\\$"+i, matcher.group(i));
+                        i++;
+                    }
+                    input = input.replaceAll(en.getKey(), b);
+                }
+            }
+        }
         CharStream charStream = new ANTLRInputStream(input);
         var lexer = new ntsLexer(charStream);
         var stream = new CommonTokenStream(lexer);
@@ -152,7 +177,7 @@ public class NTScript implements Opcodes {
             Scope scope = scopes.get(i);
 
             List<TypeDescription> params = new ArrayList<>();
-            TypeDescription typeDefinitions = bb.toTypeDescription();
+
             //params.add(typeDefinitions);
             for (Variable value : scope.fnVars.values()) {
                 params.add(new TypeDescription.ForLoadedType(value.getRuntimeType()));
@@ -275,6 +300,7 @@ public class NTScript implements Opcodes {
         private Class<? extends Annotation>[] fieldAnnotations;
         private Class<? extends Annotation>[] classAnnotations;
         private String debugOutput;
+        private Map<String, String> macros = new LinkedHashMap<>();
 
         public Builder add(Object o) {
             fns.add(o);
@@ -288,6 +314,11 @@ public class NTScript implements Opcodes {
 
         public Builder withEnum(Class o) {
             enums.add(o);
+            return this;
+        }
+
+        public Builder macro(String k, String v) {
+            macros.put(k,v);
             return this;
         }
 
@@ -332,7 +363,8 @@ public class NTScript implements Opcodes {
                     enums,
                     fieldAnnotations,
                     classAnnotations,
-                    debugOutput
+                    debugOutput,
+                    macros
             );
         }
     }

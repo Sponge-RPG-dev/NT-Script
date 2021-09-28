@@ -6,7 +6,7 @@ import static cz.neumimto.nts.annotations.ScriptMeta.*;
 public class C {
 
     @Handler
-    public boolean c(@NamedParam("int") int q, @NamedParam("string") String s) {
+    public boolean c(@NamedParam("int") double q, @NamedParam("string") String s) {
         return q < 100;
     }
 }

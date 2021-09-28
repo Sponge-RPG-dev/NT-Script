@@ -9,7 +9,7 @@ apply plugin: 'maven-publish'
 
 
 group 'cz.neumimto.nts'
-version '0.0.4'
+version '0.0.6'
 
 repositories {
     mavenCentral()
@@ -17,9 +17,9 @@ repositories {
 
 dependencies {
     antlr 'org.antlr:antlr4:4.9.2' // use ANTLR version 4
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
-    api 'net.bytebuddy:byte-buddy:1.11.15'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
+    api 'net.bytebuddy:byte-buddy:1.11.16'
 }
 
 test {

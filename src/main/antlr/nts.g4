@@ -31,7 +31,7 @@ type_comparison : left=comparable_expr op=( LESS | GREATER | LESS_EQUAL | GREATE
                 ;
 
 comparable_expr : type_bool
-                | type_integer
+                | type_double
                 | variable_reference
                 | function_call
                 ;
@@ -49,7 +49,7 @@ assignment_values : rval
                   ;
 
 rval : type_literal
-     | type_integer
+     | type_double
      | function_call
      | type_enum
      | type_bool
@@ -77,7 +77,10 @@ argument : name=IDENTIFIER '=' value=rval   ;
 newline : CRLF;
 
 type_literal : LITERAL;
-type_integer : INT;
+type_double : INT+ PT INT+
+            | PT INT+
+            | INT+
+            ;
 
 type_bool : TRUE
           | FALSE
@@ -127,6 +130,7 @@ IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]*;
 VARIABLE_IDENTIFIER : '@' IDENTIFIER;
 fragment DIGIT : ('0'..'9');
 INT : [0-9]+;
+DOT : '.';
 fragment LETTER : ('a'..'z' | 'A'..'Z');
 
 

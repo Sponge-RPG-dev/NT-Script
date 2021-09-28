@@ -7,28 +7,28 @@ public class DecompileTest {
  //   C C;
  //   L L;
     P P;
-  //  MP MP;
 
-    public Tests.Result a() {
-       // boolean b = false;
-       // boolean a = true;
-        String a = "A";
-        int c = 2;
-        Runnable r = () ->{
-            P.print(a, c);
-        } ;
+    public DecompileTest(int i) {
 
+    }
+    //  MP MP;
 
-    //   int i = (int) (1 * Math.random());
-    //   int b = 30;
-    //   boolean k = i < b;
+    public Tests.Result a(double k) {
+        String test = "test";
+        double d = 10000D;
+        Runnable runnable = () -> P.print(d, test);
 
-      // Runnable r = () -> {
-      //     int i = 0;
-      // };
+        runnable.run();
 
-
+        Runnable runnable2 = () -> {
+            P.print(0d, "FN NO ARGS");
+        };
 
         return Tests.Result.OK;
     }
+
+    public void d(double w) {
+
+    }
+
 }
