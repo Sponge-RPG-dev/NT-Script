@@ -9,6 +9,7 @@ import net.bytebuddy.description.enumeration.EnumerationDescription;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.implementation.bytecode.Duplication;
 import net.bytebuddy.implementation.bytecode.Removal;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.constant.*;
@@ -21,6 +22,8 @@ import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.utility.JavaConstant;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -35,6 +38,10 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
     protected void addInsn(StackManipulation sm) {
         scriptContext.currentScope().add(sm);
+    }
+
+    protected StackManipulation previouusInsn() {
+        return scriptContext.currentScope().impl.get(scriptContext.currentScope().impl.size() -1);
     }
     
     @Override
@@ -139,18 +146,23 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                 return scriptContext;
             }
         }
-        Object mechanic = scriptContext.findMechanic(functionName);
+        Executable e = scriptContext.findExecutableElement(functionName);
+        Parameter[] parameters = new Parameter[0];
+        if (e instanceof Constructor c) {
+            parameters = c.getParameters();
+            addInsn(new New(c.getDeclaringClass()));
+            addInsn(Duplication.SINGLE);
+        } else {
+            addInsn(MethodVariableAccess.loadThis());
 
-        addInsn(MethodVariableAccess.loadThis());
+            FieldDescription.InDefinedShape field = scriptContext.getInsnType().getDeclaredFields()
+                    .filter(ElementMatchers.named(e.getDeclaringClass().getSimpleName()))
+                    .getOnly();
 
-        FieldDescription.InDefinedShape field = scriptContext.getInsnType().getDeclaredFields()
-                .filter(ElementMatchers.named(mechanic.getClass().getSimpleName()))
-                .getOnly();
+            addInsn(FieldAccess.forField(field).read());
 
-        addInsn(FieldAccess.forField(field).read());
-
-        Parameter[] parameters = scriptContext.findHandler(mechanic, functionName).getParameters();
-
+            parameters = e.getParameters();
+        }
         for (Parameter parameter : parameters) {
             ScriptMeta.NamedParam annotation = parameter.getAnnotation(ScriptMeta.NamedParam.class);
             if (annotation == null) {
@@ -158,6 +170,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             }
             ntsParser.ArgumentContext argument = findArgumentForNamedParam(ctx.argument(), annotation.value());
             if (argument == null) {
+                //defaults
                 if (parameter.getType() == int.class || parameter.getType() == boolean.class) {
                     addInsn(IntegerConstant.forValue(0));
                 } else if (parameter.getType() == double.class) {
@@ -168,18 +181,36 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                     addInsn(NullConstant.INSTANCE);
                 }
             } else {
+
+
                 ntsParser.RvalContext value = argument.value;
                 String name = argument.name.getText();
+
+
                 visitChildren(value);
+
+                //typecasts
+                //todo this should be better, maybe keep track of last loaded offset on the stack and eventually cast
+                if (parameter.getType() != double.class && parameter.getType().isPrimitive()) {
+                    addInsn(TypeCasts.castDoubleTo(parameter.getType()));
+                }
             }
         }
 
-        Method method = scriptContext.findHandler(mechanic, functionName);
-        addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(method)));
+        if (e instanceof Constructor c) {
 
-        if (method.getReturnType() != void.class && ctx.getParent() instanceof ntsParser.StatementContext) {
-            addInsn(Removal.SINGLE);
+            addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedConstructor(c)));
+            if (ctx.getParent() instanceof ntsParser.StatementContext) {
+                addInsn(Removal.SINGLE);
+            }
+        } else {
+            Method method = (Method) e;
+            addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(method)));
+            if (method.getReturnType() != void.class && ctx.getParent() instanceof ntsParser.StatementContext) {
+                addInsn(Removal.SINGLE);
+            }
         }
+
         return scriptContext;
     }
 

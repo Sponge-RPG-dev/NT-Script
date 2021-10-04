@@ -13,7 +13,7 @@ public interface ScriptMeta {
         String value();
     }
 
-    @Target(ElementType.METHOD)
+    @Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
     @Retention(RetentionPolicy.RUNTIME)
     @interface Handler {}
 

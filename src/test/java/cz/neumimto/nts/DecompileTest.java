@@ -1,5 +1,10 @@
 package cz.neumimto.nts;
 
+import cz.neumimto.nts.annotations.ScriptMeta;
+
+import static cz.neumimto.nts.annotations.ScriptMeta.*;
+
+@Function("test_ctr")
 public class DecompileTest {
 
     //A A;
@@ -8,22 +13,23 @@ public class DecompileTest {
  //   L L;
     P P;
 
-    public DecompileTest(int i) {
-
+    @Handler
+    public DecompileTest(@NamedParam("int") int i) {
+        System.out.println("DecompileTest init");
     }
     //  MP MP;
 
     public Tests.Result a(double k) {
-        String test = "test";
-        double d = 10000D;
-        Runnable runnable = () -> P.print(d, test);
-
-        runnable.run();
-
-        Runnable runnable2 = () -> {
-            P.print(0d, "FN NO ARGS");
-        };
-
+     //   String test = "test";
+     //   double d = 10000D;
+     //   Runnable runnable = () -> P.print(d, test);
+//
+     //   runnable.run();
+//
+     //   Runnable runnable2 = () -> {
+     //       P.print(0d, "FN NO ARGS");
+     //   };
+        DecompileTest test = new DecompileTest((int) k);
         return Tests.Result.OK;
     }
 

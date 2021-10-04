@@ -21,7 +21,7 @@ public class Tests {
     public void test() throws Exception {
        String k = """
           @text = "test"
-      ##    @bool_t = t
+          @bool_t = t
           @bool_f = false
           @int = 10000
           
@@ -66,11 +66,15 @@ public class Tests {
           
      #     @lesser = @int <= 70000
           
-          @runnable = fn @text @bool_f @int
-            print{val=@text}
-          END
-       
-          runnable{}
+          @test = test_ctr{int=@int}
+          
+          
+          
+     #     @runnable = fn @text @bool_f  
+     #       print{val=@text}
+     #     END
+     #  
+     #     runnable{}
           
           @function1 = fn
              print{val="FN NO ARGS"}
@@ -87,6 +91,7 @@ public class Tests {
                 .implementingType(Test.class)
                 .withEnum(Result.class)
                 .add(List.of(new A(), new B(), new C(), new L(), new MP(), new P()))
+                .add(DecompileTest.class)
                 .setClassNamePattern("aaa")
                 .build();
 

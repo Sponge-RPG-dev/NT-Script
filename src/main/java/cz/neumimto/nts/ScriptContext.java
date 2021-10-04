@@ -4,6 +4,8 @@ import cz.neumimto.nts.bytecode.Variable;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -31,7 +33,8 @@ public class ScriptContext {
         return scopes;
     }
 
-    public static Method findHandler(Object mechanic, String functionName) {
+
+    public static Executable findHandler(Object mechanic, String functionName) {
         Class<?> mClass = mechanic.getClass();
         String rootVal = mClass.isAnnotationPresent(Function.class) ? mClass.getAnnotation(Function.class).value() : "";
         for (Method declaredMethod : mClass.getDeclaredMethods()) {
@@ -45,14 +48,53 @@ public class ScriptContext {
         throw new RuntimeException("Mechanic is missing @Handler function " + mClass);
     }
 
-    public Object findMechanic(String functionName) {
-        return findMechanic(functionName, this.mechanics);
+
+    public Executable findExecutableElement(String functionName) {
+        String rootVal;
+        for (Object mechanic : mechanics) {
+            rootVal = "";
+            if (mechanic instanceof Class<?> c) {
+
+                String i = rootVal;
+                if (c.isAnnotationPresent(Function.class)) {
+                    i += c.getAnnotation(Function.class).value();
+                }
+                for (Constructor<?> constructor : c.getConstructors()) {
+                    String fn = i;
+                    if (constructor.isAnnotationPresent(Function.class)) {
+                        fn += constructor.getAnnotation(Function.class).value();
+                    }
+
+                    if (constructor.isAnnotationPresent(Handler.class) && functionName.equalsIgnoreCase(fn)) {
+                        return constructor;
+                    }
+                }
+            } else {
+                String i = rootVal;
+
+                if (mechanic.getClass().isAnnotationPresent(Function.class)) {
+                    i += mechanic.getClass().getAnnotation(Function.class).value();
+                }
+                for (Method declaredMethod : mechanic.getClass().getDeclaredMethods()) {
+                    String fn = i;
+
+                    if (declaredMethod.isAnnotationPresent(Function.class)) {
+                        fn += declaredMethod.getAnnotation(Function.class).value();
+                    }
+                    if (declaredMethod.isAnnotationPresent(Handler.class) && functionName.equalsIgnoreCase(fn)) {
+                        return declaredMethod;
+                    }
+                }
+            }
+        }
+        throw new RuntimeException("Unknown mechanic " + functionName);
     }
 
-
+    @Deprecated
     public static Object findMechanic(String functionName, Collection<Object> mechanics) {
         String rootVal = "";
         for (Object mechanic : mechanics) {
+            rootVal = "";
             if (mechanic.getClass().isAnnotationPresent(Function.class)) {
                 rootVal = mechanic.getClass().getAnnotation(Function.class).value();
             }

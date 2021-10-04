@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.nio.file.Files;
@@ -109,7 +110,9 @@ public class NTScript {
 
         List<String> functions = fnVisitor.getFunctions();
 
-        Set<Object> requiredFns = findRequiredFns(functions);
+        ScriptContext temp = new ScriptContext(new HashMap<>(), fns, enums);
+
+        Set<Class<?>> requiredFns = findRequiredFns(temp, functions);
 
 
         ByteBuddy byteBuddy = new ByteBuddy();
@@ -149,8 +152,8 @@ public class NTScript {
 
         generated++;
 
-        for (Object requiredFn : requiredFns) {
-            DynamicType.Builder.FieldDefinition.Optional.Valuable<?> dbfv = bb.defineField(requiredFn.getClass().getSimpleName(), requiredFn.getClass(), Opcodes.ACC_PUBLIC);
+        for (Class<?> requiredFn : requiredFns) {
+            DynamicType.Builder.FieldDefinition.Optional.Valuable<?> dbfv = bb.defineField(requiredFn.getSimpleName(), requiredFn, Opcodes.ACC_PUBLIC);
 
             DynamicType.Builder.FieldDefinition.Optional<?> dbf = null;
             if (fieldAnnotations != null) {
@@ -164,7 +167,7 @@ public class NTScript {
 
         var visitor = new VisitorImpl(new ScriptContext(
                 getImplementingMethodParams(),
-                requiredFns,
+                fns,
                 this.enums));
 
 
@@ -269,8 +272,8 @@ public class NTScript {
         return map;
     }
 
-    private Set<Object> findRequiredFns(List<String> functions) {
-        return functions.stream().map(f->ScriptContext.findMechanic(f, fns)).collect(Collectors.toSet());
+    private Set<Class<?>> findRequiredFns(ScriptContext scriptContext, List<String> functions) {
+        return functions.stream().map(scriptContext::findExecutableElement).filter(a->a instanceof Method).map(Executable::getDeclaringClass).collect(Collectors.toSet());
     }
 
     public Class compile(FileInputStream fis) throws IOException {
