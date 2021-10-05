@@ -7,84 +7,84 @@ import java.util.List;
 public class Tests {
 
     public enum Result {
-        OK
+        OK, NOK
     }
 
     public static abstract class Test {
         @ScriptMeta.ScriptTarget
-        public Result test(){
+        public Result test() {
             return null;
-        };
+        }
+
+        ;
     }
 
     @org.junit.jupiter.api.Test
     public void test() throws Exception {
-       String k = """
-          @text = "test"
-          @bool_t = t
-          @bool_f = false
-          @int = 10000
+        String k = """
+         
+         #C O M M E N T
+         
+         @text = "test"
+         @bool_t = t
+         @bool_f = false
+         @int = 10000
+         
+         @param = call{string=@text, func=method{int=50}}
+         
+         IF test{int= @int, string=call{string=@text}}
+             @int2 = 5000
+         END
+         
+         @text="re-assigment"
+         print{val=@text}
+         
+         IF @bool_f
+             @int3=700000
+         END
+               
+         @x = list{size=3}
+         FOREACH @entity IN @x
+            print{val=@entity}
+         END
           
-     #    #C O M M E N T
-     #    
-     #    @param = call{string=@text, func=method{int=50}}
-     #    
-     #    IF test{int= @int, string=call{string=@text}}
-     #        @int2 = 5000
-     #    END
-     #    
-     #    @text="re-assigment"
-     #     print{val=@text}
-     #    
-     #    IF @bool_f
-     #        @int3=700000
-     #    END
-     #  
-     #    @x = list{size=3}
-     #    FOREACH @entity IN @x
-     #       print{val=@entity}
-     #    END
-     #     
-     #    print{val="POP NEXT"}
-     #    list{size=50}
-     #    
-     #    FOREACH @entity IN list{size=5}
-     #        print{val=@entity}
-     #    END
-     #  
-     #    print{val="XXXX"}
-     #  
-     #    FOREACH @entity IN @x
-     #       IF True
-     #        print{val="CCC"}
-     #       END
-     #    END
-     #    
-     #    IF @int <= 70000
-     #      print{val="@int <= 70000"}
-     #    END
-          
-     #     @lesser = @int <= 70000
-          
-          @test = test_ctr{int=@int}
-          
-          
-          
-     #     @runnable = fn @text @bool_f  
-     #       print{val=@text}
-     #     END
-     #  
-     #     runnable{}
-          
-          @function1 = fn
-             print{val="FN NO ARGS"}
-          END
-          
-          RETURN Result.OK
-        """;
-   // k = """
-   //     @param = call{string="xxxx"}
-   // """;
+         print{val="POP NEXT"}
+         list{size=50}
+         
+         FOREACH @entity IN list{size=5}
+             print{val=@entity}
+         END
+               
+         print{val="XXXX"}
+               
+         FOREACH @entity IN @x
+            IF True
+             print{val="CCC"}
+            END
+         END
+         
+         IF @int <= 70000
+           print{val="@int <= 70000"}
+         END
+         
+       #  todo bad operand stack int inlined bool
+       #  @lesser = @int <= 70000 
+         
+         @test = test_ctr{int=@int}
+         
+         @obj = test_ctr{int=@int}
+         
+         IF @int <= 70000 
+             print{val="10000 <= 70000"}
+         END
+         
+         method{missing=@obj}
+         @function1 = fn @int
+            print{val="FN NO ARGS", int=@int}       
+         END
+         RETURN Result.OK
+                """;
+
         NTScript script = new NTScript.Builder()
                 .package_("cz.neumimto.test")
                 .debugOutput("/tmp/test")
@@ -97,17 +97,36 @@ public class Tests {
 
         Class aClass = script.compile(k);
         Object o = aClass.newInstance();
+        initAndRun(o);
+    }
+
+    private void initAndRun(Object o) {
         try {
-         //  o.getClass().getDeclaredField("A").set(o, new A());
-         //  o.getClass().getDeclaredField("B").set(o, new B());
-         //  o.getClass().getDeclaredField("C").set(o, new C());
-         //  o.getClass().getDeclaredField("L").set(o, new L());
+            o.getClass().getDeclaredField("A").set(o, new A());
+        } catch (Throwable t) {
+        }
+
+        try {
+            o.getClass().getDeclaredField("B").set(o, new B());
+        } catch (Throwable t) {
+        }
+        try {
+            o.getClass().getDeclaredField("C").set(o, new C());
+        } catch (Throwable t) {
+        }
+        try {
+            o.getClass().getDeclaredField("L").set(o, new L());
+        } catch (Throwable t) {
+        }
+        try {
             o.getClass().getDeclaredField("P").set(o, new P());
+        } catch (Throwable t) {
+        }
+        try {
             o.getClass().getDeclaredMethod("test").invoke(o);
         } catch (Throwable t) {
             t.printStackTrace();
         }
-
     }
 
 }

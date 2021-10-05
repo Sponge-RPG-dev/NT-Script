@@ -13,7 +13,9 @@ import net.bytebuddy.description.field.FieldList;
 import net.bytebuddy.description.method.MethodList;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.dynamic.scaffold.ClassWriterStrategy;
 import net.bytebuddy.dynamic.scaffold.InstrumentedType;
+import net.bytebuddy.dynamic.scaffold.MethodGraph;
 import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.bytecode.ByteCodeAppender;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
@@ -110,7 +112,7 @@ public class NTScript {
 
         List<String> functions = fnVisitor.getFunctions();
 
-        ScriptContext temp = new ScriptContext(new HashMap<>(), fns, enums);
+        ScriptContext temp = new ScriptContext(new LinkedHashMap<>(), fns, enums);
 
         Set<Class<?>> requiredFns = findRequiredFns(temp, functions);
 
@@ -128,12 +130,12 @@ public class NTScript {
                 .visit(new AsmVisitorWrapper() {
                     @Override
                     public int mergeWriter(int flags) {
-                        return flags | ClassWriter.COMPUTE_FRAMES;
+                        return flags | ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS;
                     }
 
                     @Override
                     public int mergeReader(int flags) {
-                        return flags | ClassWriter.COMPUTE_FRAMES;
+                        return flags | ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS;
                     }
 
                     @Override
@@ -247,9 +249,9 @@ public class NTScript {
         };
     }
 
-    private HashMap<String, Variable> getImplementingMethodParams() {
+    private LinkedHashMap<String, Variable> getImplementingMethodParams() {
 
-        var map = new HashMap<String, Variable>();
+        var map = new LinkedHashMap<String, Variable>();
 
         Optional<Method> first = Stream.of(implementingType.getDeclaredMethods())
                 .filter(m -> m.isAnnotationPresent(ScriptMeta.ScriptTarget.class)).findFirst();

@@ -4,6 +4,7 @@ import cz.neumimto.nts.bytecode.Variable;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
+import javax.swing.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
@@ -22,7 +23,7 @@ public class ScriptContext {
     private final Set<Class<?>> enums;
     private TypeDescription insnType;
 
-    public ScriptContext(HashMap<String, Variable> variables, Collection<Object> mechanics, Set<Class<?>> enums) {
+    public ScriptContext(LinkedHashMap<String, Variable> variables, Collection<Object> mechanics, Set<Class<?>> enums) {
         this.scopes.add(new Scope(variables, Collections.emptyList(), null));
         this.current = scopes.get(0);
         this.mechanics = mechanics;
@@ -198,10 +199,15 @@ public class ScriptContext {
     }
 
     public Scope createNewScopeWithVars(Map<String, Variable> fnVars, Scope currentScope) {
-        Map<String, Variable> fixedOffsets = new HashMap<>();
+        LinkedHashMap<String, Variable> fixedOffsets = new LinkedHashMap<>();
+
+
+        int offset = 1;
         for (Map.Entry<String, Variable> e : fnVars.entrySet()) {
-            fixedOffsets.put(e.getKey(), e.getValue().copyWithNewOffset(fixedOffsets.size() + 1)); //(0 THIS)
+            fixedOffsets.put(e.getKey(), e.getValue().copyWithNewOffset(offset)); //(0 THIS)
+            offset += e.getValue().getOffsetSize();
         }
+
         var scope = new Scope(fixedOffsets, Collections.emptyList(), currentScope);
         scope.fnVars = fnVars;
         scope.id = scopes.size() - 1;

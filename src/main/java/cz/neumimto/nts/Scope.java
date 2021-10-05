@@ -9,7 +9,7 @@ import java.util.function.Function;
 public class Scope {
     public static Function<Integer, String> LAMBDA_METHOD_NAME = i -> "lambda$a$" + i;
 
-    public final Map<String, Variable> variables;
+    public final LinkedHashMap<String, Variable> variables;
 
     private final List<Scope> parentsForVarLookup;
     public final Scope parent;
@@ -21,7 +21,7 @@ public class Scope {
     public Map<String, Variable> fnVars;
     public int id;
 
-    public Scope(Map<String, Variable> variables, List<Scope> parentsForVarLookup, Scope currentScope) {
+    public Scope(LinkedHashMap<String, Variable> variables, List<Scope> parentsForVarLookup, Scope currentScope) {
         this.variables = variables;
         this.parentsForVarLookup = parentsForVarLookup;
         this.parent = currentScope;
@@ -29,7 +29,13 @@ public class Scope {
     }
 
     public int getNextVariableOffset() {
-        return variables.size() +1;
+        Optional<Variable> max = variables.values().stream()
+                .max(Comparator.comparingInt(Variable::getOffset));
+        if (max.isPresent()) {
+            return max.get().getOffset() + max.get().getOffsetSize();
+        } else {
+            return 1;
+        }
     }
 
     public Scope add(StackManipulation sm) {

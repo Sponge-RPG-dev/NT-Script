@@ -1,14 +1,11 @@
 package cz.neumimto.nts.bytecode;
 
-import cz.neumimto.nts.ntsParser;
 import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.StackSize;
 import net.bytebuddy.jar.asm.Label;
 import net.bytebuddy.jar.asm.MethodVisitor;
 import net.bytebuddy.jar.asm.Opcodes;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
 
 
 public interface Branching extends StackManipulation{
@@ -17,34 +14,51 @@ public interface Branching extends StackManipulation{
 
     static class ArithmeticalComp implements StackManipulation {
         private final Label label;
-        private final int opcode;
+        private final int dcmp;
+        private final int jump;
 
-        public ArithmeticalComp(Label label, int opcode) {
+        public ArithmeticalComp(Label label, int dcmp, int jump) {
             this.label = label;
-            this.opcode = opcode;
+            this.dcmp = dcmp;
+            this.jump = jump;
         }
+
 
         //todo
         public static StackManipulation forToken(String text, Label ifLabel) {
-            int opCode = switch (text) {
+            int dcmp = 0;
+            int jump = 0;
+
+            switch (text) {
                 case "<":
-                    yield Opcodes.DCMPG;
-                case ">":
-                    yield Opcodes.DCMPL;
-                case ">=":
-                case "=>":
-                    yield Opcodes.DCMPG;
+                    dcmp = Opcodes.DCMPG;
+                    jump = Opcodes.IFGE;
+                    break;
                 case "<=":
                 case "=<":
-                    yield Opcodes.IF_ICMPGT;
+                    dcmp = Opcodes.DCMPG;
+                    jump = Opcodes.IFGT;
+                    break;
+                case ">":
+                    dcmp = Opcodes.DCMPL;
+                    jump = Opcodes.IFLE;
+                    break;
+                case ">=":
+                case "=>":
+                    dcmp = Opcodes.DCMPL;
+                    jump = Opcodes.IFLT;
+                    break;
                 case "==":
-                    yield Opcodes.IF_ICMPEQ;
+                    dcmp = Opcodes.DCMPL;
+                    jump = Opcodes.IFEQ;
+                    break;
                 case "!=":
-                    yield Opcodes.IF_ICMPNE;
+                    dcmp = Opcodes.DCMPL;
+                    jump = Opcodes.IFNE;
                 default:
                     throw new RuntimeException("Unknown comp sign " + text);
-            };
-            return new ArithmeticalComp(ifLabel, opCode);
+            }
+            return new ArithmeticalComp(ifLabel, dcmp, jump);
         }
 
         @Override
@@ -54,7 +68,8 @@ public interface Branching extends StackManipulation{
 
         @Override
         public StackManipulation.Size apply(MethodVisitor mv, Implementation.Context ctx) {
-            mv.visitJumpInsn(opcode, label);
+            mv.visitInsn(dcmp);
+            mv.visitJumpInsn(jump, label);
             return StackSize.SINGLE.toDecreasingSize();
         }
     }

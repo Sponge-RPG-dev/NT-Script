@@ -14,6 +14,14 @@ public class Variable implements Comparable<Variable> {
         this.runtimeType = runtimeType;
     }
 
+    public int getOffset() {
+        return offset;
+    }
+
+    public int getOffsetSize() {
+        return (runtimeType == double.class || runtimeType == long.class) ? 2 : 1;
+    }
+
     public Variable copyWithNewOffset(int offset) {
         return new Variable(offset, this.methodVariableAccess, this.runtimeType);
     }

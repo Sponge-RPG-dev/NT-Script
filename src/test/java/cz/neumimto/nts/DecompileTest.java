@@ -1,6 +1,8 @@
 package cz.neumimto.nts;
 
-import cz.neumimto.nts.annotations.ScriptMeta;
+import net.bytebuddy.jar.asm.Opcodes;
+
+import java.util.Random;
 
 import static cz.neumimto.nts.annotations.ScriptMeta.*;
 
@@ -12,6 +14,8 @@ public class DecompileTest {
  //   C C;
  //   L L;
     P P;
+
+    Opcodes po;
 
     @Handler
     public DecompileTest(@NamedParam("int") int i) {
@@ -29,7 +33,15 @@ public class DecompileTest {
      //   Runnable runnable2 = () -> {
      //       P.print(0d, "FN NO ARGS");
      //   };
-        DecompileTest test = new DecompileTest((int) k);
+        double u = 0;
+        double w = new Random().nextDouble();
+        if (k > 10) {
+            double q =50;
+            if (k <= 70000) {
+                return Tests.Result.NOK;
+            }
+            System.out.println(q);
+        }
         return Tests.Result.OK;
     }
 
