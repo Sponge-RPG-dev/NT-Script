@@ -60,7 +60,7 @@ public class NTScript {
     private Class<? extends Annotation>[] classAnnotations;
     private String debugOutput;
     private int generated = 0;
-    private Map<String, String> macros;
+    private Map<Pattern, String> macros;
 
     private NTScript(Set<Object> fns,
                      Class<?> implementingType,
@@ -70,7 +70,7 @@ public class NTScript {
                      Class<? extends Annotation>[] fieldAnnotations,
                      Class<? extends Annotation>[] classAnnotations,
                      String debugOutput,
-                     Map<String, String> macros) {
+                     Map<Pattern, String> macros) {
         this.macros = macros;
         this.fns = fns;
         this.implementingType = implementingType;
@@ -84,23 +84,25 @@ public class NTScript {
 
 
     public Class compile(String input) {
-        for (Map.Entry<String, String> en : macros.entrySet()) {
-            Pattern compile = Pattern.compile(en.getKey());
-            Matcher matcher = compile.matcher(input);
-            if (matcher.matches()) {
+        for (Map.Entry<Pattern, String> en : macros.entrySet()) {
+            Pattern pattern = en.getKey();
+            Matcher matcher = pattern.matcher(input);
+
+            if ( matcher.find()) {
                 if (matcher.groupCount() == 0) {
-                    input = input.replaceAll(en.getKey(), en.getValue());
+                    input = input.replaceAll(pattern.pattern(), en.getValue());
                 } else {
                     int i = 1;
                     String b = en.getValue();
-                    while (matcher.groupCount() <= i) {
+                    while (matcher.groupCount() < i) {
                         b = b.replaceAll("\\$"+i, matcher.group(i));
                         i++;
                     }
-                    input = input.replaceAll(en.getKey(), b);
+                    input = input.replaceAll(en.getKey().pattern(), b);
                 }
             }
         }
+
         CharStream charStream = new ANTLRInputStream(input);
         var lexer = new ntsLexer(charStream);
         var stream = new CommonTokenStream(lexer);
@@ -305,7 +307,7 @@ public class NTScript {
         private Class<? extends Annotation>[] fieldAnnotations;
         private Class<? extends Annotation>[] classAnnotations;
         private String debugOutput;
-        private Map<String, String> macros = new LinkedHashMap<>();
+        private Map<Pattern, String> macros = new LinkedHashMap<>();
 
         public Builder add(Object o) {
             fns.add(o);
@@ -322,7 +324,7 @@ public class NTScript {
             return this;
         }
 
-        public Builder macro(String k, String v) {
+        public Builder macro(Pattern k, String v) {
             macros.put(k,v);
             return this;
         }

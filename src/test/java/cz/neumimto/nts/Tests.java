@@ -1,8 +1,10 @@
 package cz.neumimto.nts;
 
 import cz.neumimto.nts.annotations.ScriptMeta;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Tests {
 
@@ -96,6 +98,28 @@ public class Tests {
                 .build();
 
         Class aClass = script.compile(k);
+        Object o = aClass.newInstance();
+        initAndRun(o);
+    }
+
+    @org.junit.jupiter.api.Test
+    public void macro() throws Throwable {
+        String test = """
+            $say hello
+            RETURN Result.OK
+        """;
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(Test.class)
+                .withEnum(Result.class)
+                .add(List.of(new A(), new B(), new C(), new L(), new MP(), new P()))
+                .add(DecompileTest.class)
+                .macro(Pattern.compile("\\$say ([a-zA-Z0-1]*)"),"print{val=\"$1\"}")
+                .setClassNamePattern("aaa")
+                .build();
+
+        Class aClass = script.compile(test);
         Object o = aClass.newInstance();
         initAndRun(o);
     }
