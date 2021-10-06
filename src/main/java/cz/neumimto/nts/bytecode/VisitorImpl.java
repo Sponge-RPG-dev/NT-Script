@@ -322,8 +322,11 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             if ("".equalsIgnoreCase(argumentContext.value.getText())) {
                 continue;
             }
-            if (text.equalsIgnoreCase(value)) {
-                return argumentContext;
+            String[] split = value.split("\\|");
+            for (String s : split) {
+                if (text.equalsIgnoreCase(value)) {
+                    return argumentContext;
+                }
             }
         }
         return null;

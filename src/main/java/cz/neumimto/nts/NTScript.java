@@ -329,6 +329,11 @@ public class NTScript {
             return this;
         }
 
+        public Builder macro(Map<Pattern, String> map) {
+            macros.putAll(map);
+            return this;
+        }
+
         public Builder package_(String packagee) {
             if (!packagee.endsWith(".")) {
                 packagee += ".";

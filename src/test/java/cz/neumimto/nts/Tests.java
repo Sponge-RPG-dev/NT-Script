@@ -115,7 +115,7 @@ public class Tests {
                 .withEnum(Result.class)
                 .add(List.of(new A(), new B(), new C(), new L(), new MP(), new P()))
                 .add(DecompileTest.class)
-                .macro(Pattern.compile("\\$say ([a-zA-Z0-1]*)"),"print{val=\"$1\"}")
+                .macro(Pattern.compile("\\$say ([a-zA-Z0-1]*)"),"print{v=\"$1\"}")
                 .setClassNamePattern("aaa")
                 .build();
 
