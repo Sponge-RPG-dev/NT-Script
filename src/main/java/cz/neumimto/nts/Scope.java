@@ -3,6 +3,8 @@ package cz.neumimto.nts;
 import cz.neumimto.nts.bytecode.Variable;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
 
@@ -20,6 +22,7 @@ public class Scope {
 
     public Map<String, Variable> fnVars;
     public int id;
+    public Variable lastVariableOnStack;
 
     public Scope(LinkedHashMap<String, Variable> variables, List<Scope> parentsForVarLookup, Scope currentScope) {
         this.variables = variables;

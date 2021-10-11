@@ -324,6 +324,12 @@ public class NTScript {
             return this;
         }
 
+
+        public Builder withEnums(Collection o) {
+            enums.addAll(o);
+            return this;
+        }
+
         public Builder macro(Pattern k, String v) {
             macros.put(k,v);
             return this;

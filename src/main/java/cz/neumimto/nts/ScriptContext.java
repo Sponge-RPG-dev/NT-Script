@@ -4,10 +4,7 @@ import cz.neumimto.nts.bytecode.Variable;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
-import javax.swing.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.*;
 
 
@@ -120,8 +117,24 @@ public class ScriptContext {
 
     public Variable createNewVariable(String variable, ntsParser.Assignment_valuesContext type) {
         var var = new Variable(currentScope().getNextVariableOffset(), getRalReturnType(type), getRalRuntimeType(type));
+        var.setGenericType(getGenericWrappedType(type));
         currentScope().variables.put(variable, var);
         return var;
+    }
+
+    private Class getGenericWrappedType(ntsParser.Assignment_valuesContext type) {
+        if (type.rval() == null || type.rval().function_call() == null) {
+            return null;
+        }
+        String fnName = type.rval().function_call().function_name.getText();
+        Executable executableElement = findExecutableElement(fnName);
+        if (executableElement instanceof Method m) {
+            Type genericReturnType = m.getGenericReturnType();
+            if (type instanceof ParameterizedType p) {
+                return (Class) p.getActualTypeArguments()[0];
+            }
+        }
+        return null;
     }
 
     public Variable createNewVariable(String variable) {
@@ -140,6 +153,14 @@ public class ScriptContext {
         } else if (rval.type_double() != null) {
             return MethodVariableAccess.DOUBLE;
         } else if (rval.function_call() != null) {
+            String fnName = rval.function_call().function_name.getText();
+            Executable executableElement = findExecutableElement(fnName);
+            if (executableElement instanceof Method m) {
+                if (m.getReturnType() == void.class) {
+                    return null;
+                }
+                return MethodVariableAccess.of(new TypeDescription.ForLoadedType(m.getReturnType()));
+            }
             return MethodVariableAccess.REFERENCE;
         } else if (rval.type_bool() != null) {
             return MethodVariableAccess.INTEGER;
@@ -161,6 +182,14 @@ public class ScriptContext {
         } else if (rval.type_double() != null) {
             return double.class;
         } else if (rval.function_call() != null) {
+            String fnName = rval.function_call().function_name.getText();
+            Executable executableElement = findExecutableElement(fnName);
+            if (executableElement instanceof Method m) {
+                if (m.getReturnType() == void.class) {
+                    return null;
+                }
+                return m.getReturnType();
+            }
             return null;
         } else if (rval.type_bool() != null) {
             return boolean.class;

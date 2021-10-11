@@ -5,6 +5,7 @@ import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.StackSize;
 import net.bytebuddy.jar.asm.MethodVisitor;
 import net.bytebuddy.jar.asm.Opcodes;
+import net.bytebuddy.jar.asm.Type;
 
 public interface TypeCasts {
 
@@ -21,6 +22,21 @@ public interface TypeCasts {
             return DOUBLE_TO_LONG;
         }
         throw new RuntimeException("Cannot typecast primitive double to " + type.getName());
+    }
+
+    static StackManipulation checkCast(Class c) {
+        return new StackManipulation() {
+            @Override
+            public boolean isValid() {
+                return true;
+            }
+
+            @Override
+            public Size apply(MethodVisitor methodVisitor, Implementation.Context implementationContext) {
+                methodVisitor.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(c));
+                return StackSize.SINGLE.toIncreasingSize();
+            }
+        };
     }
 
     static class Cast implements StackManipulation {

@@ -3,10 +3,14 @@ package cz.neumimto.nts.bytecode;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 public class Variable implements Comparable<Variable> {
     int offset;
     MethodVariableAccess methodVariableAccess;
     private Class runtimeType;
+    private Class genericType;
 
     public Variable(int offset, MethodVariableAccess methodVariableAccess, Class runtimeType) {
         this.offset = offset;
@@ -36,6 +40,14 @@ public class Variable implements Comparable<Variable> {
 
     public Class getRuntimeType() {
         return runtimeType;
+    }
+
+    public Class getGenericType() {
+        return genericType;
+    }
+
+    public void setGenericType(Class genericType) {
+        this.genericType = genericType;
     }
 
     public void setRuntimeType(Class runtimeType) {

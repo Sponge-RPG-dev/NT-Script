@@ -22,10 +22,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.utility.JavaConstant;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.*;
 
 public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
@@ -50,6 +47,17 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         Optional<Variable> var = scriptContext.getVariable(variableIdentifier.getText());
         visitAssignment_values(ctx.assignment_values());
         Variable variable = var.orElseGet(() -> scriptContext.createNewVariable(variableIdentifier.getText(), ctx.assignment_values()));
+        if (ctx.assignment_values().rval() != null && ctx.assignment_values().rval().function_call() != null) {
+            Executable e =  scriptContext.findExecutableElement(ctx.assignment_values().rval().function_call().function_name.getText());
+            if (e instanceof Method m) {
+                Type genericReturnType = m.getGenericReturnType();
+                if (genericReturnType instanceof ParameterizedType p) {
+                    if (p.getActualTypeArguments().length == 1) {
+                        variable.setGenericType((Class) p.getActualTypeArguments()[0]);
+                    }
+                }
+            }
+        }
         addInsn(variable.store());
         return scriptContext;
     }
@@ -92,6 +100,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         if (variable.isPresent()) {
             Variable variable1 = variable.get();
             addInsn(variable1.load());
+            scriptContext.currentScope().lastVariableOnStack = variable1;
         } else {
             throw new RuntimeException("unknown variable reference " + text);
         }
@@ -135,7 +144,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         Optional<Variable> variable = scriptContext.getVariable("@" + functionName);
         if(variable.isPresent()) {
             Variable variable1 = variable.get();
-            if (Runnable.class.isAssignableFrom(variable1.getRuntimeType())) {
+            if (variable1.getRuntimeType() != null && Runnable.class.isAssignableFrom(variable1.getRuntimeType())) {
                 try {
                     addInsn(variable1.load());;
                     Method run = Runnable.class.getDeclaredMethod("run");
@@ -194,6 +203,11 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                 if (parameter.getType() != double.class && parameter.getType().isPrimitive()) {
                     addInsn(TypeCasts.castDoubleTo(parameter.getType()));
                 }
+                Variable c = scriptContext.currentScope().lastVariableOnStack;
+                if (c != null && c.getRuntimeType() != parameter.getType() && c.getGenericType() != null) {
+                    addInsn(TypeCasts.checkCast(c.getGenericType()));
+                }
+                scriptContext.currentScope().lastVariableOnStack = null;
             }
         }
 
@@ -267,6 +281,25 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             addInsn(variable.load());
             addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(m_next)));
             Variable nextObj = scriptContext.createNewVariable(ctx.variable_reference().getText());
+
+            //todo generify to typecast
+            //TypeCasts.checkCast(nextObj.assumeGenericType());
+
+            if (ctx.iterable().variable_reference() != null) {
+                Variable var = scriptContext.currentScope().findVariable(ctx.iterable().variable_reference().getText());
+                if (var.getGenericType() != null) {
+                    addInsn(TypeCasts.checkCast(var.getGenericType()));
+                    nextObj.setRuntimeType(var.getGenericType());
+                }
+            } else if (ctx.iterable().function_call() != null) {
+                Executable executableElement = scriptContext.findExecutableElement(ctx.iterable().function_call().function_name.getText());
+                Type[] genericParameterTypes = executableElement.getGenericParameterTypes();
+                if (genericParameterTypes.length == 1) {
+                    addInsn(TypeCasts.checkCast((Class)genericParameterTypes[0]));
+                    nextObj.setRuntimeType((Class)genericParameterTypes[0]);
+                }
+            }
+
             addInsn(nextObj.store());
 
             // body
@@ -324,7 +357,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             }
             String[] split = value.split("\\|");
             for (String s : split) {
-                if (text.equalsIgnoreCase(value)) {
+                if (text.equalsIgnoreCase(s)) {
                     return argumentContext;
                 }
             }

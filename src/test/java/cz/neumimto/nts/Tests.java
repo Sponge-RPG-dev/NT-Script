@@ -106,6 +106,7 @@ public class Tests {
     public void macro() throws Throwable {
         String test = """
             $say hello
+            $settings.abcd
             RETURN Result.OK
         """;
         NTScript script = new NTScript.Builder()
@@ -116,6 +117,7 @@ public class Tests {
                 .add(List.of(new A(), new B(), new C(), new L(), new MP(), new P()))
                 .add(DecompileTest.class)
                 .macro(Pattern.compile("\\$say ([a-zA-Z0-1]*)"),"print{v=\"$1\"}")
+                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "print{ctx=@context, key=\"$1\"}")
                 .setClassNamePattern("aaa")
                 .build();
 
@@ -123,6 +125,40 @@ public class Tests {
         Object o = aClass.newInstance();
         initAndRun(o);
     }
+
+    @org.junit.jupiter.api.Test
+    public void test1() throws Throwable {
+        String test = """
+                @d = $settings.d
+                @r = $settings.r
+        
+                @list = find{c=@r, context=@context}
+        
+                FOREACH @entity in @list
+                    IF compare{e=@entity, v=5}
+                       print{e=@entity}
+                    END
+                END
+        
+                RETURN Result.OK
+                """;
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(ImplTargets.Subclass.class)
+                .withEnum(Result.class)
+                .add(List.of(new TestFunctions()))
+                .add(DecompileTest.class)
+                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "config_value{context=@context, key=\"$1\"}")
+                .setClassNamePattern("aaa")
+                .build();
+
+        Class aClass = script.compile(test);
+        ImplTargets.Subclass o = (ImplTargets.Subclass) aClass.newInstance();
+        initAndRun(o);
+        o.run(new Input(), new Context());
+    }
+
 
     private void initAndRun(Object o) {
         try {
@@ -147,9 +183,12 @@ public class Tests {
         } catch (Throwable t) {
         }
         try {
+            o.getClass().getDeclaredField("TestFunctions").set(o, new TestFunctions());
+        } catch (Throwable t) {
+        }
+        try {
             o.getClass().getDeclaredMethod("test").invoke(o);
         } catch (Throwable t) {
-            t.printStackTrace();
         }
     }
 
