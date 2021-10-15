@@ -6,6 +6,7 @@ import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.Consumer;
 
 
 import static cz.neumimto.nts.annotations.ScriptMeta.Function;
@@ -14,17 +15,19 @@ import static cz.neumimto.nts.annotations.ScriptMeta.Handler;
 
 public class ScriptContext {
 
+    public Consumer<String> loggerDataConsumer;
     private List<Scope> scopes = new ArrayList<>();
     private Scope current;
     private final Collection<Object> mechanics;
     private final Set<Class<?>> enums;
     private TypeDescription insnType;
 
-    public ScriptContext(LinkedHashMap<String, Variable> variables, Collection<Object> mechanics, Set<Class<?>> enums) {
+    public ScriptContext(LinkedHashMap<String, Variable> variables, Collection<Object> mechanics, Set<Class<?>> enums, Consumer<String> loggerDataProvider) {
         this.scopes.add(new Scope(variables, Collections.emptyList(), null));
         this.current = scopes.get(0);
         this.mechanics = mechanics;
         this.enums = enums;
+        this.loggerDataConsumer = loggerDataProvider;
     }
 
     public List<Scope> getScopes() {
@@ -243,4 +246,11 @@ public class ScriptContext {
         scopes.add(scope);
         return scope;
     }
+
+    public void log(String s) {
+        if (loggerDataConsumer != null) {
+            loggerDataConsumer.accept(s);
+        }
+    }
+
 }

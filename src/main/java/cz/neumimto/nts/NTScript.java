@@ -13,9 +13,7 @@ import net.bytebuddy.description.field.FieldList;
 import net.bytebuddy.description.method.MethodList;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.dynamic.scaffold.ClassWriterStrategy;
 import net.bytebuddy.dynamic.scaffold.InstrumentedType;
-import net.bytebuddy.dynamic.scaffold.MethodGraph;
 import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.bytecode.ByteCodeAppender;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
@@ -39,6 +37,7 @@ import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -54,6 +53,7 @@ public class NTScript {
     private final Set<Object> fns;
     private final Class<?> implementingType;
     private final String packagee;
+    private final Consumer<String> loggerDataProvider;
     private String classNamePattern;
     private Set<Class<?>> enums;
     private Class<? extends Annotation>[] fieldAnnotations;
@@ -70,7 +70,7 @@ public class NTScript {
                      Class<? extends Annotation>[] fieldAnnotations,
                      Class<? extends Annotation>[] classAnnotations,
                      String debugOutput,
-                     Map<Pattern, String> macros) {
+                     Map<Pattern, String> macros, Consumer<String> loggerDataProvider) {
         this.macros = macros;
         this.fns = fns;
         this.implementingType = implementingType;
@@ -80,8 +80,8 @@ public class NTScript {
         this.fieldAnnotations = fieldAnnotations;
         this.classAnnotations = classAnnotations;
         this.debugOutput = debugOutput;
+        this.loggerDataProvider = loggerDataProvider;
     }
-
 
     public Class compile(String input) {
         for (Map.Entry<Pattern, String> en : macros.entrySet()) {
@@ -114,7 +114,7 @@ public class NTScript {
 
         List<String> functions = fnVisitor.getFunctions();
 
-        ScriptContext temp = new ScriptContext(new LinkedHashMap<>(), fns, enums);
+        ScriptContext temp = new ScriptContext(new LinkedHashMap<>(), fns, enums, loggerDataProvider);
 
         Set<Class<?>> requiredFns = findRequiredFns(temp, functions);
 
@@ -172,7 +172,8 @@ public class NTScript {
         var visitor = new VisitorImpl(new ScriptContext(
                 getImplementingMethodParams(),
                 fns,
-                this.enums));
+                this.enums,
+                loggerDataProvider));
 
 
         visitor.getScriptContext().setInsnType(bb.toTypeDescription());
@@ -308,6 +309,12 @@ public class NTScript {
         private Class<? extends Annotation>[] classAnnotations;
         private String debugOutput;
         private Map<Pattern, String> macros = new LinkedHashMap<>();
+        private Consumer<String> loggerDataProvider;
+
+        public Builder logging(Consumer<String> o) {
+            loggerDataProvider = o;
+            return this;
+        }
 
         public Builder add(Object o) {
             fns.add(o);
@@ -382,7 +389,8 @@ public class NTScript {
                     fieldAnnotations,
                     classAnnotations,
                     debugOutput,
-                    macros
+                    macros,
+                    loggerDataProvider
             );
         }
     }

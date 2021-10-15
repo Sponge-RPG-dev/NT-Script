@@ -1,10 +1,7 @@
 package cz.neumimto.nts.bytecode;
 
-import cz.neumimto.nts.Scope;
-import cz.neumimto.nts.ScriptContext;
+import cz.neumimto.nts.*;
 import cz.neumimto.nts.annotations.ScriptMeta;
-import cz.neumimto.nts.ntsBaseVisitor;
-import cz.neumimto.nts.ntsParser;
 import net.bytebuddy.description.enumeration.EnumerationDescription;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.method.MethodDescription;
@@ -179,6 +176,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             }
             ntsParser.ArgumentContext argument = findArgumentForNamedParam(ctx.argument(), annotation.value());
             if (argument == null) {
+                scriptContext.log("Call " + functionName + " is missing value for parameter "+annotation.value()+", will fallback to default");
                 //defaults
                 if (parameter.getType() == int.class || parameter.getType() == boolean.class) {
                     addInsn(IntegerConstant.forValue(0));
@@ -372,4 +370,5 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     public ScriptContext getScriptContext() {
         return scriptContext;
     }
+
 }
