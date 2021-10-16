@@ -112,6 +112,18 @@ public class ntsBaseListener implements ntsListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPutField_statement(ntsParser.PutField_statementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPutField_statement(ntsParser.PutField_statementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterReturn_statement(ntsParser.Return_statementContext ctx) { }
 	/**
 	 * {@inheritDoc}

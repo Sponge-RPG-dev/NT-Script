@@ -6,6 +6,7 @@ import net.bytebuddy.description.enumeration.EnumerationDescription;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.bytecode.Duplication;
 import net.bytebuddy.implementation.bytecode.Removal;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
@@ -15,8 +16,11 @@ import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodReturn;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import net.bytebuddy.jar.asm.Label;
+import net.bytebuddy.jar.asm.MethodVisitor;
 import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.utility.JavaConstant;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.lang.reflect.*;
@@ -35,17 +39,20 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     }
 
     protected StackManipulation previouusInsn() {
-        return scriptContext.currentScope().impl.get(scriptContext.currentScope().impl.size() -1);
+        return scriptContext.currentScope().impl.get(scriptContext.currentScope().impl.size() - 1);
     }
-    
+
     @Override
     public ScriptContext visitAssignment_statement(ntsParser.Assignment_statementContext ctx) {
         TerminalNode variableIdentifier = ctx.VARIABLE_IDENTIFIER();
         Optional<Variable> var = scriptContext.getVariable(variableIdentifier.getText());
-        visitAssignment_values(ctx.assignment_values());
+
         Variable variable = var.orElseGet(() -> scriptContext.createNewVariable(variableIdentifier.getText(), ctx.assignment_values()));
+        visitAssignment_values(ctx.assignment_values());
+
+
         if (ctx.assignment_values().rval() != null && ctx.assignment_values().rval().function_call() != null) {
-            Executable e =  scriptContext.findExecutableElement(ctx.assignment_values().rval().function_call().function_name.getText());
+            Executable e = scriptContext.findExecutableElement(ctx.assignment_values().rval().function_call().function_name.getText());
             if (e instanceof Method m) {
                 Type genericReturnType = m.getGenericReturnType();
                 if (genericReturnType instanceof ParameterizedType p) {
@@ -55,7 +62,33 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                 }
             }
         }
+
         addInsn(variable.store());
+        return scriptContext;
+    }
+
+    @Override
+    public ScriptContext visitPutField_statement(ntsParser.PutField_statementContext ctx) {
+
+        String fieldName = ctx.field.getText();
+        Field field = null;
+        try {
+            Variable variable = scriptContext.getVariable(ctx.fieldOwner.getText()).get();
+            addInsn(variable.load());;
+            String variableName = ctx.fieldOwner.getText();
+            field = scriptContext.getVariable(variableName).get().getRuntimeType().getDeclaredField(fieldName);
+
+
+            visitChildren(ctx.rval());
+            Variable c = scriptContext.currentScope().lastVariableOnStack;
+            if (c != null && c.getRuntimeType() != field.getType() && c.getRuntimeType().isPrimitive()) {
+                addInsn(TypeCasts.castDoubleTo(field.getType()));
+            }
+
+            addInsn(FieldAccess.forField(new FieldDescription.InDefinedShape.ForLoadedField(field)).write());
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException("Unknown field " + fieldName);
+        }
         return scriptContext;
     }
 
@@ -139,11 +172,12 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     public ScriptContext visitFunction_call(ntsParser.Function_callContext ctx) {
         String functionName = ctx.function_name.getText();
         Optional<Variable> variable = scriptContext.getVariable("@" + functionName);
-        if(variable.isPresent()) {
+        if (variable.isPresent()) {
             Variable variable1 = variable.get();
             if (variable1.getRuntimeType() != null && Runnable.class.isAssignableFrom(variable1.getRuntimeType())) {
                 try {
-                    addInsn(variable1.load());;
+                    addInsn(variable1.load());
+                    ;
                     Method run = Runnable.class.getDeclaredMethod("run");
                     addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(run)));
                 } catch (NoSuchMethodException e) {
@@ -176,7 +210,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             }
             ntsParser.ArgumentContext argument = findArgumentForNamedParam(ctx.argument(), annotation.value());
             if (argument == null) {
-                scriptContext.log("Call " + functionName + " is missing value for parameter "+annotation.value()+", will fallback to default");
+                scriptContext.log("Call " + functionName + " is missing value for parameter " + annotation.value() + ", will fallback to default");
                 //defaults
                 if (parameter.getType() == int.class || parameter.getType() == boolean.class) {
                     addInsn(IntegerConstant.forValue(0));
@@ -214,6 +248,19 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedConstructor(c)));
             if (ctx.getParent() instanceof ntsParser.StatementContext) {
                 addInsn(Removal.SINGLE);
+            }
+            ntsParser.Assignment_statementContext parent = null;
+            ParserRuleContext prc = ctx.getParent();
+            while (prc != null) {
+                prc = prc.getParent();
+                if (prc instanceof ntsParser.Assignment_statementContext a) {
+                    parent = a;
+                    break;
+                }
+            }
+            if (parent != null) {
+                Variable variable1 = scriptContext.currentScope().findVariable(parent.VARIABLE_IDENTIFIER().getText());
+                variable1.setRuntimeType(c.getDeclaringClass());
             }
         } else {
             Method method = (Method) e;
@@ -293,8 +340,8 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                 Executable executableElement = scriptContext.findExecutableElement(ctx.iterable().function_call().function_name.getText());
                 Type[] genericParameterTypes = executableElement.getGenericParameterTypes();
                 if (genericParameterTypes.length == 1) {
-                    addInsn(TypeCasts.checkCast((Class)genericParameterTypes[0]));
-                    nextObj.setRuntimeType((Class)genericParameterTypes[0]);
+                    addInsn(TypeCasts.checkCast((Class) genericParameterTypes[0]));
+                    nextObj.setRuntimeType((Class) genericParameterTypes[0]);
                 }
             }
 

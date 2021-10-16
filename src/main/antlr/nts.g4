@@ -14,6 +14,7 @@ statement_list : statement terminator
                ;
 
 statement : assignment_statement
+          | putField_statement
           | function_call
           | return_statement
           | if_statement
@@ -40,6 +41,8 @@ variable_reference : variable=VARIABLE_IDENTIFIER ;
 
 assignment_statement : name=VARIABLE_IDENTIFIER '=' value=assignment_values ;
 
+putField_statement :  fieldOwner=VARIABLE_IDENTIFIER '.' field=IDENTIFIER '=' value=rval ;
+
 return_statement	:	RETURN value=rval	;
 
 lambda : FUNCTION vars=variable_reference* terminator statement_list END ;
@@ -61,7 +64,6 @@ iterable :
          | function_call
          | variable_reference
          ;
-
 
 type_enum : type=IDENTIFIER '.' value=IDENTIFIER ;
 

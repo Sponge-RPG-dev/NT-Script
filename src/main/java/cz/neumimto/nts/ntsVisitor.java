@@ -59,6 +59,12 @@ public interface ntsVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAssignment_statement(ntsParser.Assignment_statementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ntsParser#putField_statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPutField_statement(ntsParser.PutField_statementContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ntsParser#return_statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

@@ -88,6 +88,16 @@ public interface ntsListener extends ParseTreeListener {
 	 */
 	void exitAssignment_statement(ntsParser.Assignment_statementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ntsParser#putField_statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterPutField_statement(ntsParser.PutField_statementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#putField_statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitPutField_statement(ntsParser.PutField_statementContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ntsParser#return_statement}.
 	 * @param ctx the parse tree
 	 */

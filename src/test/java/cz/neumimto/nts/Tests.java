@@ -82,8 +82,9 @@ public class Tests {
          
          method{missing=@obj}
          @function1 = fn @int
-            print{val="FN NO ARGS", int=@int}       
+            print{val="FN NOARGS", int=@int}       
          END
+       
          RETURN Result.OK
                 """;
 
@@ -159,6 +160,30 @@ public class Tests {
         o.run(new Input(), new Context());
     }
 
+    @org.junit.jupiter.api.Test
+    public void test2_putfield() throws Throwable {
+        String test = """
+                @k = 20
+                @obj = TestPojo{}
+                @obj.intField = @k
+                @obj.doubleField = @k
+                
+                RETURN Result.OK
+                """;
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(ImplTargets.Subclass.class)
+                .withEnum(Result.class)
+                .add(TestPojo.class)
+                .setClassNamePattern("test2_putfield")
+                .build();
+
+        Class aClass = script.compile(test);
+        ImplTargets.Subclass o = (ImplTargets.Subclass) aClass.newInstance();
+        initAndRun(o);
+        o.run(new Input(), new Context());
+    }
 
     private void initAndRun(Object o) {
         try {
