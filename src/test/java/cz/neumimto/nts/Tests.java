@@ -167,7 +167,7 @@ public class Tests {
                 @obj = TestPojo{}
                 @obj.intField = @k
                 @obj.doubleField = @k
-                
+                @obj.doubleFieldViaSetter = @k
                 RETURN Result.OK
                 """;
         NTScript script = new NTScript.Builder()

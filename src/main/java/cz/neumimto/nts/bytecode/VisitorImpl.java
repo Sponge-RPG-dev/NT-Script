@@ -71,25 +71,41 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     public ScriptContext visitPutField_statement(ntsParser.PutField_statementContext ctx) {
 
         String fieldName = ctx.field.getText();
-        Field field = null;
+        Variable variable = scriptContext.getVariable(ctx.fieldOwner.getText()).get();
+        addInsn(variable.load());
+        String variableName = ctx.fieldOwner.getText();
+
+        visitChildren(ctx.rval());
+        Variable c = scriptContext.currentScope().lastVariableOnStack;
+        Variable fieldOwner = scriptContext.getVariable(variableName).get();
         try {
-            Variable variable = scriptContext.getVariable(ctx.fieldOwner.getText()).get();
-            addInsn(variable.load());;
-            String variableName = ctx.fieldOwner.getText();
-            field = scriptContext.getVariable(variableName).get().getRuntimeType().getDeclaredField(fieldName);
+            Field field = fieldOwner.getRuntimeType().getDeclaredField(fieldName);
 
-
-            visitChildren(ctx.rval());
-            Variable c = scriptContext.currentScope().lastVariableOnStack;
+            if (!Modifier.isPublic(field.getModifiers())) {
+                throw new NoSuchFieldException();
+            }
             if (c != null && c.getRuntimeType() != field.getType() && c.getRuntimeType().isPrimitive()) {
                 addInsn(TypeCasts.castDoubleTo(field.getType()));
             }
 
             addInsn(FieldAccess.forField(new FieldDescription.InDefinedShape.ForLoadedField(field)).write());
+            return scriptContext;
         } catch (NoSuchFieldException e) {
-            throw new RuntimeException("Unknown field " + fieldName);
+            //assume setter
+            Method[] declaredMethods = fieldOwner.getRuntimeType().getDeclaredMethods();
+            for (Method declaredMethod : declaredMethods) {
+                if (Modifier.isPublic(declaredMethod.getModifiers())) {
+                    if (declaredMethod.getParameters().length == 1) {
+                        String mName = declaredMethod.getName();
+                        if (mName.equalsIgnoreCase(fieldName) || mName.equalsIgnoreCase("set"+fieldName)) {
+                            addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(declaredMethod)));
+                            return scriptContext;
+                        }
+                    }
+                }
+            }
         }
-        return scriptContext;
+        throw new RuntimeException("Unknown field " + c.getRuntimeType().getSimpleName() + "." + fieldName + ", setter method not found either");
     }
 
     @Override

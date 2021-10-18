@@ -8,8 +8,13 @@ public class TestPojo {
     public double doubleField;
     public int intField;
 
+    private double doubleFieldViaSetter;
     @ScriptMeta.Handler
     public TestPojo() {
 
+    }
+
+    public void doubleFieldViaSetter(double doubleField) {
+        this.doubleField = doubleField;
     }
 }
