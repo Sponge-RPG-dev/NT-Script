@@ -161,13 +161,17 @@ public class Tests {
     }
 
     @org.junit.jupiter.api.Test
-    public void test2_putfield() throws Throwable {
+    public void test2_put_get_field() throws Throwable {
         String test = """
                 @k = 20
                 @obj = TestPojo{}
                 @obj.intField = @k
                 @obj.doubleField = @k
-                @obj.doubleFieldViaSetter = @k
+                @obj.privateField = @k
+                
+                @get = @obj.doubleField
+                @get_typecasted = @obj.intField
+                @get_getter = @obj.privateField
                 RETURN Result.OK
                 """;
         NTScript script = new NTScript.Builder()

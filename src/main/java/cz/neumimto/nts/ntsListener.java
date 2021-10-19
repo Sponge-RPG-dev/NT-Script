@@ -78,16 +78,6 @@ public interface ntsListener extends ParseTreeListener {
 	 */
 	void exitVariable_reference(ntsParser.Variable_referenceContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ntsParser#assignment_statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterAssignment_statement(ntsParser.Assignment_statementContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ntsParser#assignment_statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitAssignment_statement(ntsParser.Assignment_statementContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link ntsParser#putField_statement}.
 	 * @param ctx the parse tree
 	 */
@@ -97,6 +87,26 @@ public interface ntsListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPutField_statement(ntsParser.PutField_statementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ntsParser#getField_statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterGetField_statement(ntsParser.GetField_statementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#getField_statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitGetField_statement(ntsParser.GetField_statementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ntsParser#assignment_statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterAssignment_statement(ntsParser.Assignment_statementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ntsParser#assignment_statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitAssignment_statement(ntsParser.Assignment_statementContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ntsParser#return_statement}.
 	 * @param ctx the parse tree

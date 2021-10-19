@@ -39,9 +39,11 @@ comparable_expr : type_bool
 
 variable_reference : variable=VARIABLE_IDENTIFIER ;
 
-assignment_statement : name=VARIABLE_IDENTIFIER '=' value=assignment_values ;
 
-putField_statement :  fieldOwner=VARIABLE_IDENTIFIER '.' field=IDENTIFIER '=' value=rval ;
+putField_statement :  fieldOwner=variable_reference '.' field=IDENTIFIER '=' value=rval ;
+getField_statement : fieldOwner=variable_reference '.' field=IDENTIFIER;
+
+assignment_statement : name=VARIABLE_IDENTIFIER '=' value=assignment_values ;
 
 return_statement	:	RETURN value=rval	;
 
@@ -58,6 +60,7 @@ rval : type_literal
      | type_bool
      | variable_reference
      | type_comparison
+     | getField_statement
      ;
 
 iterable :
@@ -79,8 +82,8 @@ argument : name=IDENTIFIER '=' value=rval   ;
 newline : CRLF;
 
 type_literal : LITERAL;
-type_double : INT+ PT INT+
-            | PT INT+
+type_double : INT+ DOT INT+
+            | DOT INT+
             | INT+
             ;
 

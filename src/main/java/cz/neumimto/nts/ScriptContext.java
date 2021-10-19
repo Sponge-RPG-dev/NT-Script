@@ -171,6 +171,18 @@ public class ScriptContext {
             return MethodVariableAccess.INTEGER;
         } else if (rval.variable_reference() != null) {
             return MethodVariableAccess.of(new TypeDescription.ForLoadedType(currentScope().variables.get(rval.getText()).getRuntimeType()));
+        } else if (rval.getField_statement() != null) {
+            Variable variable = currentScope().variables.get(rval.getField_statement().fieldOwner.getText());
+
+            String fName = rval.getField_statement().field.getText();
+
+            Field[] fields = variable.getRuntimeType().getDeclaredFields();
+
+            for (Field f : fields) {
+                if (f.getName().equalsIgnoreCase(fName)) {
+                    return MethodVariableAccess.of(new TypeDescription.ForLoadedType(f.getType()));
+                }
+            }
         }
         throw new RuntimeException("Unknown type " + rval.getText());
     }
@@ -200,6 +212,18 @@ public class ScriptContext {
             return currentScope().findVariable(rval.getText()).getRuntimeType();
         } else if (rval.type_comparison() != null) {
             return double.class;
+        } else if (rval.getField_statement() != null) {
+            Variable variable = currentScope().variables.get(rval.getField_statement().fieldOwner.getText());
+
+            String fName = rval.getField_statement().field.getText();
+
+            Field[] fields = variable.getRuntimeType().getDeclaredFields();
+
+            for (Field f : fields) {
+                if (f.getName().equalsIgnoreCase(fName)) {
+                    return f.getType();
+                }
+            }
         }
         throw new RuntimeException("Unknown type " + rval.getText());
     }

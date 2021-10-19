@@ -66,14 +66,21 @@ public class ntsBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements nt
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitAssignment_statement(ntsParser.Assignment_statementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitPutField_statement(ntsParser.PutField_statementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitPutField_statement(ntsParser.PutField_statementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitGetField_statement(ntsParser.GetField_statementContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitAssignment_statement(ntsParser.Assignment_statementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

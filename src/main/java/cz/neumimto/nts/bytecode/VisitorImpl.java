@@ -68,6 +68,40 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     }
 
     @Override
+    public ScriptContext visitGetField_statement(ntsParser.GetField_statementContext ctx) {
+        String fieldName = ctx.field.getText();
+        Variable variable = scriptContext.getVariable(ctx.fieldOwner.getText()).get();
+        addInsn(variable.load());
+        String variableName = ctx.fieldOwner.getText();
+
+        Variable c = scriptContext.currentScope().lastVariableOnStack;
+        Variable fieldOwner = scriptContext.getVariable(variableName).get();
+
+        try {
+            Field field = fieldOwner.getRuntimeType().getDeclaredField(fieldName);
+            if (!Modifier.isPublic(field.getModifiers())) {
+                throw new NoSuchFieldException();
+            }
+            addInsn(FieldAccess.forField(new FieldDescription.InDefinedShape.ForLoadedField(field)).read());
+            return scriptContext;
+        } catch (NoSuchFieldException e) {
+            Method[] declaredMethods = fieldOwner.getRuntimeType().getDeclaredMethods();
+            for (Method declaredMethod : declaredMethods) {
+                if (Modifier.isPublic(declaredMethod.getModifiers())) {
+                    if (declaredMethod.getParameters().length == 0) {
+                        String mName = declaredMethod.getName();
+                        if (mName.equalsIgnoreCase(fieldName) || mName.equalsIgnoreCase("get"+fieldName)) {
+                            addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(declaredMethod)));
+                            return scriptContext;
+                        }
+                    }
+                }
+            }
+        }
+        throw new RuntimeException("Unknown field " + c.getRuntimeType().getSimpleName() + "." + fieldName + ", getter method not found either");
+    }
+
+    @Override
     public ScriptContext visitPutField_statement(ntsParser.PutField_statementContext ctx) {
 
         String fieldName = ctx.field.getText();

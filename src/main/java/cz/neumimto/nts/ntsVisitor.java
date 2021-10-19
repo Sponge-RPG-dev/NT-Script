@@ -53,17 +53,23 @@ public interface ntsVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitVariable_reference(ntsParser.Variable_referenceContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ntsParser#assignment_statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAssignment_statement(ntsParser.Assignment_statementContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link ntsParser#putField_statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitPutField_statement(ntsParser.PutField_statementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ntsParser#getField_statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGetField_statement(ntsParser.GetField_statementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ntsParser#assignment_statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssignment_statement(ntsParser.Assignment_statementContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ntsParser#return_statement}.
 	 * @param ctx the parse tree
