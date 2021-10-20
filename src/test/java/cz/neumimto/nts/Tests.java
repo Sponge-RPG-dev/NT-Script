@@ -3,6 +3,7 @@ package cz.neumimto.nts;
 import cz.neumimto.nts.annotations.ScriptMeta;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Executable;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -223,6 +224,34 @@ public class Tests {
         initAndRun(o);
         o.run(new Input(), new Context());
     }
+
+    @org.junit.jupiter.api.Test
+    public void test4_lib() throws Throwable {
+        String test = """
+                @k = 20
+                @k = max{a=@k ,b=8}
+                print{int=@k}
+                RETURN Result.OK
+                """;
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(ImplTargets.Subclass.class)
+                .withEnum(Result.class)
+                .add(TestPojo.class).add(new P())
+                .add(
+                        Math.class.getDeclaredMethod("max", double.class, double.class),
+                        List.of("a", "b")
+                )
+                .setClassNamePattern("test3_expr")
+                .build();
+
+        Class aClass = script.compile(test);
+        ImplTargets.Subclass o = (ImplTargets.Subclass) aClass.newInstance();
+        initAndRun(o);
+        o.run(new Input(), new Context());
+    }
+
 
     private void initAndRun(Object o) {
         try {

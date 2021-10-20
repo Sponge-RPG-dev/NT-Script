@@ -1,5 +1,6 @@
 package cz.neumimto.nts;
 
+import cz.neumimto.nts.annotations.ScriptMeta;
 import cz.neumimto.nts.bytecode.Variable;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
@@ -8,6 +9,8 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 import static cz.neumimto.nts.annotations.ScriptMeta.Function;
@@ -19,94 +22,81 @@ public class ScriptContext {
     public Consumer<String> loggerDataConsumer;
     private List<Scope> scopes = new ArrayList<>();
     private Scope current;
-    private final Collection<Object> mechanics;
+    private final Collection<Descriptor> mechanics;
     private final Set<Class<?>> enums;
     private TypeDescription insnType;
 
     public ScriptContext(LinkedHashMap<String, Variable> variables, Collection<Object> mechanics, Set<Class<?>> enums, Consumer<String> loggerDataProvider) {
         this.scopes.add(new Scope(variables, Collections.emptyList(), null));
         this.current = scopes.get(0);
-        this.mechanics = mechanics;
+        this.mechanics = remap(mechanics);
         this.enums = enums;
         this.loggerDataConsumer = loggerDataProvider;
+    }
+
+    private List<Descriptor> remap(Collection<Object> mechanics) {
+        List<Descriptor> d = new ArrayList<>();
+
+        outer: for (Object mechanic : mechanics) {
+
+            if (mechanic instanceof Descriptor de) {
+                d.add(de);
+                continue;
+            }
+
+            if (mechanic instanceof Class<?> c) {
+                String i = "";
+                if (c.isAnnotationPresent(Function.class)) {
+                    i += c.getAnnotation(Function.class).value();
+                }
+                for (Constructor<?> constructor : c.getConstructors()) {
+                    Descriptor descriptor = annotatedExecutableToDescriptor(constructor, i);
+                    if (descriptor != null) {
+                        d.add(descriptor);
+                    }
+                }
+            }
+
+            String i = "";
+            if (mechanic.getClass().isAnnotationPresent(Function.class)) {
+                i += mechanic.getClass().getAnnotation(Function.class).value();
+            }
+            for (Method declaredMethod : mechanic.getClass().getDeclaredMethods()) {
+                Descriptor descriptor = annotatedExecutableToDescriptor(declaredMethod, i);
+                if (descriptor != null) {
+                    d.add(descriptor);
+                }
+            }
+
+        }
+        return d;
+    }
+
+    private Descriptor annotatedExecutableToDescriptor(Executable e, String fn) {
+        if (e.isAnnotationPresent(Function.class)) {
+            fn += e.getAnnotation(Function.class).value();
+        }
+
+        if (e.isAnnotationPresent(Handler.class)) {
+            Parameter[] parameters = e.getParameters();
+            var list =Stream.of(parameters)
+                    .filter(p->p.isAnnotationPresent(ScriptMeta.NamedParam.class))
+                    .map(p->p.getAnnotation(ScriptMeta.NamedParam.class).value())
+                    .collect(Collectors.toList());
+            return new Descriptor(e,fn, list);
+        }
+        return null;
     }
 
     public List<Scope> getScopes() {
         return scopes;
     }
 
-
-    public static Executable findHandler(Object mechanic, String functionName) {
-        Class<?> mClass = mechanic.getClass();
-        String rootVal = mClass.isAnnotationPresent(Function.class) ? mClass.getAnnotation(Function.class).value() : "";
-        for (Method declaredMethod : mClass.getDeclaredMethods()) {
-            if (declaredMethod.isAnnotationPresent(Function.class)) {
-                rootVal += declaredMethod.getAnnotation(Function.class).value();
-            }
-            if (declaredMethod.isAnnotationPresent(Handler.class) && rootVal.equalsIgnoreCase(functionName)) {
-                return declaredMethod;
-            }
-        }
-        throw new RuntimeException("Mechanic is missing @Handler function " + mClass);
-    }
-
-
-    public Executable findExecutableElement(String functionName) {
-        String rootVal;
-        for (Object mechanic : mechanics) {
-            rootVal = "";
-            if (mechanic instanceof Class<?> c) {
-
-                String i = rootVal;
-                if (c.isAnnotationPresent(Function.class)) {
-                    i += c.getAnnotation(Function.class).value();
-                }
-                for (Constructor<?> constructor : c.getConstructors()) {
-                    String fn = i;
-                    if (constructor.isAnnotationPresent(Function.class)) {
-                        fn += constructor.getAnnotation(Function.class).value();
-                    }
-
-                    if (constructor.isAnnotationPresent(Handler.class) && functionName.equalsIgnoreCase(fn)) {
-                        return constructor;
-                    }
-                }
-            } else {
-                String i = rootVal;
-
-                if (mechanic.getClass().isAnnotationPresent(Function.class)) {
-                    i += mechanic.getClass().getAnnotation(Function.class).value();
-                }
-                for (Method declaredMethod : mechanic.getClass().getDeclaredMethods()) {
-                    String fn = i;
-
-                    if (declaredMethod.isAnnotationPresent(Function.class)) {
-                        fn += declaredMethod.getAnnotation(Function.class).value();
-                    }
-                    if (declaredMethod.isAnnotationPresent(Handler.class) && functionName.equalsIgnoreCase(fn)) {
-                        return declaredMethod;
-                    }
-                }
-            }
-        }
-        throw new RuntimeException("Unknown mechanic " + functionName);
-    }
-
-    @Deprecated
-    public static Object findMechanic(String functionName, Collection<Object> mechanics) {
-        String rootVal = "";
-        for (Object mechanic : mechanics) {
-            rootVal = "";
-            if (mechanic.getClass().isAnnotationPresent(Function.class)) {
-                rootVal = mechanic.getClass().getAnnotation(Function.class).value();
-            }
-            if (functionName.equalsIgnoreCase(rootVal)) {
+    public Descriptor findExecutableElement(String functionName) {
+        for (Descriptor mechanic : mechanics) {
+            if (mechanic.functionName.equalsIgnoreCase(functionName)) {
                 return mechanic;
             }
-            try {
-                findHandler(mechanic, functionName);
-                return mechanic;
-            } catch (RuntimeException e) {}
         }
         throw new RuntimeException("Unknown mechanic " + functionName);
     }
@@ -131,7 +121,7 @@ public class ScriptContext {
             return null;
         }
         String fnName = type.rval().function_call().function_name.getText();
-        Executable executableElement = findExecutableElement(fnName);
+        Executable executableElement = findExecutableElement(fnName).executable;
         if (executableElement instanceof Method m) {
             Type genericReturnType = m.getGenericReturnType();
             if (type instanceof ParameterizedType p) {
@@ -158,7 +148,7 @@ public class ScriptContext {
             return MethodVariableAccess.DOUBLE;
         } else if (rval.function_call() != null) {
             String fnName = rval.function_call().function_name.getText();
-            Executable executableElement = findExecutableElement(fnName);
+            Executable executableElement = findExecutableElement(fnName).executable;
             if (executableElement instanceof Method m) {
                 if (m.getReturnType() == void.class) {
                     return null;
@@ -209,7 +199,7 @@ public class ScriptContext {
             return double.class;
         } else if (rval.function_call() != null) {
             String fnName = rval.function_call().function_name.getText();
-            Executable executableElement = findExecutableElement(fnName);
+            Executable executableElement = findExecutableElement(fnName).executable;
             if (executableElement instanceof Method m) {
                 if (m.getReturnType() == void.class) {
                     return null;

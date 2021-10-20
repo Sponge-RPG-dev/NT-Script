@@ -26,6 +26,7 @@ import net.bytebuddy.pool.TypePool;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +37,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Wrapper;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -278,7 +280,7 @@ public class NTScript {
     }
 
     private Set<Class<?>> findRequiredFns(ScriptContext scriptContext, List<String> functions) {
-        return functions.stream().map(scriptContext::findExecutableElement).filter(a->a instanceof Method).map(Executable::getDeclaringClass).collect(Collectors.toSet());
+        return functions.stream().map(scriptContext::findExecutableElement).map(a->a.executable).filter(a->a instanceof Method).map(Executable::getDeclaringClass).collect(Collectors.toSet());
     }
 
     public Class compile(FileInputStream fis) throws IOException {
@@ -323,6 +325,16 @@ public class NTScript {
 
         public Builder add(Collection o) {
             fns.addAll(o);
+            return this;
+        }
+
+        public Builder add(Executable o, List<String> paramNames) {
+            fns.add(new Descriptor(o, o.getName(), paramNames));
+            return this;
+        }
+
+        public Builder add(Executable o, String overridedName, List<String> paramNames) {
+            fns.add(new Descriptor(o, overridedName, paramNames));
             return this;
         }
 

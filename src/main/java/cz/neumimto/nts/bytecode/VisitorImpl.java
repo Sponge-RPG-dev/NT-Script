@@ -50,7 +50,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
 
         if (ctx.assignment_values().rval() != null && ctx.assignment_values().rval().function_call() != null) {
-            Executable e = scriptContext.findExecutableElement(ctx.assignment_values().rval().function_call().function_name.getText());
+            Executable e = scriptContext.findExecutableElement(ctx.assignment_values().rval().function_call().function_name.getText()).executable;
             if (e instanceof Method m) {
                 Type genericReturnType = m.getGenericReturnType();
                 if (genericReturnType instanceof ParameterizedType p) {
@@ -247,7 +247,6 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             if (variable1.getRuntimeType() != null && Runnable.class.isAssignableFrom(variable1.getRuntimeType())) {
                 try {
                     addInsn(variable1.load());
-                    ;
                     Method run = Runnable.class.getDeclaredMethod("run");
                     addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(run)));
                 } catch (NoSuchMethodException e) {
@@ -256,31 +255,28 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                 return scriptContext;
             }
         }
-        Executable e = scriptContext.findExecutableElement(functionName);
-        Parameter[] parameters = new Parameter[0];
-        if (e instanceof Constructor c) {
-            parameters = c.getParameters();
+        Descriptor d = scriptContext.findExecutableElement(functionName);
+        Parameter[] parameters = d.executable.getParameters();
+
+        if (d.executable instanceof Constructor c) {
             addInsn(new New(c.getDeclaringClass()));
             addInsn(Duplication.SINGLE);
         } else {
             addInsn(MethodVariableAccess.loadThis());
 
             FieldDescription.InDefinedShape field = scriptContext.getInsnType().getDeclaredFields()
-                    .filter(ElementMatchers.named(e.getDeclaringClass().getSimpleName()))
+                    .filter(ElementMatchers.named(d.executable.getDeclaringClass().getSimpleName()))
                     .getOnly();
 
             addInsn(FieldAccess.forField(field).read());
-
-            parameters = e.getParameters();
         }
+        int i = 0;
         for (Parameter parameter : parameters) {
-            ScriptMeta.NamedParam annotation = parameter.getAnnotation(ScriptMeta.NamedParam.class);
-            if (annotation == null) {
-                continue;
-            }
-            ntsParser.ArgumentContext argument = findArgumentForNamedParam(ctx.argument(), annotation.value());
+            String paramName = d.namedParams.get(i);
+            i++;
+            ntsParser.ArgumentContext argument = findArgumentForNamedParam(ctx.argument(), paramName);
             if (argument == null) {
-                scriptContext.log("Call " + functionName + " is missing value for parameter " + annotation.value() + ", will fallback to default");
+                scriptContext.log("Call " + functionName + " is missing value for parameter " + paramName + ", will fallback to default");
                 //defaults
                 if (parameter.getType() == int.class || parameter.getType() == boolean.class) {
                     addInsn(IntegerConstant.forValue(0));
@@ -313,7 +309,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             }
         }
 
-        if (e instanceof Constructor c) {
+        if (d.executable instanceof Constructor c) {
 
             addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedConstructor(c)));
             if (ctx.getParent() instanceof ntsParser.StatementContext) {
@@ -333,7 +329,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                 variable1.setRuntimeType(c.getDeclaringClass());
             }
         } else {
-            Method method = (Method) e;
+            Method method = (Method) d.executable;
             addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(method)));
             if (method.getReturnType() != void.class && ctx.getParent() instanceof ntsParser.StatementContext) {
                 addInsn(Removal.SINGLE);
@@ -407,7 +403,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                     nextObj.setRuntimeType(var.getGenericType());
                 }
             } else if (ctx.iterable().function_call() != null) {
-                Executable executableElement = scriptContext.findExecutableElement(ctx.iterable().function_call().function_name.getText());
+                Executable executableElement = scriptContext.findExecutableElement(ctx.iterable().function_call().function_name.getText()).executable;
                 Type[] genericParameterTypes = executableElement.getGenericParameterTypes();
                 if (genericParameterTypes.length == 1) {
                     addInsn(TypeCasts.checkCast((Class) genericParameterTypes[0]));
