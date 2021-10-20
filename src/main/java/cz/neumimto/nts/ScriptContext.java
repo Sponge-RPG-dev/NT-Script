@@ -7,6 +7,7 @@ import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 
 import static cz.neumimto.nts.annotations.ScriptMeta.Function;
@@ -183,8 +184,18 @@ public class ScriptContext {
                     return MethodVariableAccess.of(new TypeDescription.ForLoadedType(f.getType()));
                 }
             }
+        } else if (rval.op != null || containsArithmeticalSign(rval.getText())){
+            return MethodVariableAccess.DOUBLE;
         }
         throw new RuntimeException("Unknown type " + rval.getText());
+    }
+
+    public static boolean containsArithmeticalSign(String input) {
+        return containsAny(input, "+", "-", "*", "/");
+    }
+
+    public static boolean containsAny(String inputStr, String... items) {
+        return Arrays.stream(items).anyMatch(inputStr::contains);
     }
 
     private Class getRalRuntimeType(ntsParser.Assignment_valuesContext val) {
@@ -224,6 +235,8 @@ public class ScriptContext {
                     return f.getType();
                 }
             }
+        } else if (rval.op != null ||ScriptContext.containsArithmeticalSign(rval.getText())) {
+            return double.class;
         }
         throw new RuntimeException("Unknown type " + rval.getText());
     }

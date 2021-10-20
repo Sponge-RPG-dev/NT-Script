@@ -189,6 +189,41 @@ public class Tests {
         o.run(new Input(), new Context());
     }
 
+    @org.junit.jupiter.api.Test
+    public void test2_expr() throws Throwable {
+        String test = """
+                @k = 20
+                @k = @k * 8
+                print{int=@k}
+                @w = 2 * 2
+                print{int=@w}
+                
+                @j = (3 / 3)
+                print{int=@j}
+                
+                @j = (3 / 3) + 1
+                print{int=@j}
+          
+                @j = -1 * (3 / 3) - 1
+                print{int=@j}
+                
+                RETURN Result.OK
+                """;
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(ImplTargets.Subclass.class)
+                .withEnum(Result.class)
+                .add(TestPojo.class).add(new P())
+                .setClassNamePattern("test3_expr")
+                .build();
+
+        Class aClass = script.compile(test);
+        ImplTargets.Subclass o = (ImplTargets.Subclass) aClass.newInstance();
+        initAndRun(o);
+        o.run(new Input(), new Context());
+    }
+
     private void initAndRun(Object o) {
         try {
             o.getClass().getDeclaredField("A").set(o, new A());

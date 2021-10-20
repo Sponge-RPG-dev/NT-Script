@@ -7,9 +7,7 @@ import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.Implementation;
-import net.bytebuddy.implementation.bytecode.Duplication;
-import net.bytebuddy.implementation.bytecode.Removal;
-import net.bytebuddy.implementation.bytecode.StackManipulation;
+import net.bytebuddy.implementation.bytecode.*;
 import net.bytebuddy.implementation.bytecode.constant.*;
 import net.bytebuddy.implementation.bytecode.member.FieldAccess;
 import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
@@ -183,6 +181,28 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             scriptContext.currentScope().lastVariableOnStack = variable1;
         } else {
             throw new RuntimeException("unknown variable reference " + text);
+        }
+        return scriptContext;
+    }
+
+    @Override
+    public ScriptContext visitRval(ntsParser.RvalContext ctx) {
+        if (ctx.left == null) {
+            visitChildren(ctx);
+        } else {
+            var left = ctx.left;
+            var right = ctx.right;
+            var op = ctx.op;
+            visitChildren(left);
+            visitChildren(right);
+            StackManipulation sm = switch (op.getText()) {
+                case "+" -> Addition.DOUBLE;
+                case "-" -> Subtraction.DOUBLE;
+                case "*" -> Multiplication.DOUBLE;
+                case "/" -> Division.DOUBLE;
+                default -> throw new RuntimeException("Unknown operation " + op.getText());
+            };
+            addInsn(sm);
         }
         return scriptContext;
     }

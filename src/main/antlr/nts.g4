@@ -61,6 +61,10 @@ rval : type_literal
      | variable_reference
      | type_comparison
      | getField_statement
+
+   //todo  | '(' rval ')'
+     | left=rval op=(PLUS | MINUS | MUL | DIV) right=rval
+
      ;
 
 iterable :
@@ -82,9 +86,9 @@ argument : name=IDENTIFIER '=' value=rval   ;
 newline : CRLF;
 
 type_literal : LITERAL;
-type_double : INT+ DOT INT+
-            | DOT INT+
-            | INT+
+type_double : MINUS? INT+ DOT INT+
+            | MINUS? DOT INT+
+            | MINUS? INT+
             ;
 
 type_bool : TRUE
