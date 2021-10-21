@@ -83,7 +83,7 @@ public class ScriptContext {
                     .filter(p->p.isAnnotationPresent(ScriptMeta.NamedParam.class))
                     .map(p->p.getAnnotation(ScriptMeta.NamedParam.class).value())
                     .collect(Collectors.toList());
-            return new Descriptor(e,fn, list);
+            return new Descriptor(e,fn, list, true);
         }
         return null;
     }

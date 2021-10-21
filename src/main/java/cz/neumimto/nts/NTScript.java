@@ -110,7 +110,7 @@ public class NTScript {
         var stream = new CommonTokenStream(lexer);
         var parser = new ntsParser(stream);
 
-        var fnVisitor = new FnVisitor();
+        var fnVisitor = new FnVisitor(fns);
         ntsParser.ScriptContext script = parser.script();
         fnVisitor.visit(script);
 
@@ -329,12 +329,12 @@ public class NTScript {
         }
 
         public Builder add(Executable o, List<String> paramNames) {
-            fns.add(new Descriptor(o, o.getName(), paramNames));
+            fns.add(new Descriptor(o, o.getName(), paramNames, false));
             return this;
         }
 
         public Builder add(Executable o, String overridedName, List<String> paramNames) {
-            fns.add(new Descriptor(o, overridedName, paramNames));
+            fns.add(new Descriptor(o, overridedName, paramNames, false));
             return this;
         }
 

@@ -191,10 +191,10 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             visitChildren(ctx);
         } else {
             var left = ctx.left;
+            visit(left);
             var right = ctx.right;
+            visit(right);
             var op = ctx.op;
-            visitChildren(left);
-            visitChildren(right);
             StackManipulation sm = switch (op.getText()) {
                 case "+" -> Addition.DOUBLE;
                 case "-" -> Subtraction.DOUBLE;
@@ -261,7 +261,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         if (d.executable instanceof Constructor c) {
             addInsn(new New(c.getDeclaringClass()));
             addInsn(Duplication.SINGLE);
-        } else {
+        } else if (d.injectedViaField) {
             addInsn(MethodVariableAccess.loadThis());
 
             FieldDescription.InDefinedShape field = scriptContext.getInsnType().getDeclaredFields()

@@ -62,8 +62,9 @@ rval : type_literal
      | type_comparison
      | getField_statement
 
-   //todo  | '(' rval ')'
-     | left=rval op=(PLUS | MINUS | MUL | DIV) right=rval
+    // | '(' rval ')'
+     | left=rval op=(MUL | DIV ) right=rval
+     | left=rval op=(PLUS | MINUS ) right=rval
 
      ;
 

@@ -231,6 +231,10 @@ public class Tests {
                 @k = 20
                 @k = max{a=@k ,b=8}
                 print{int=@k}
+                @pojo = obj{w=@k}
+                
+                @l = random{} * 0.4 - 0.2
+                @print{int=@l}
                 RETURN Result.OK
                 """;
         NTScript script = new NTScript.Builder()
@@ -242,6 +246,10 @@ public class Tests {
                 .add(
                         Math.class.getDeclaredMethod("max", double.class, double.class),
                         List.of("a", "b")
+                )
+                .add(Math.class.getDeclaredMethod("random"), List.of())
+                .add(
+                        TestPojo.class.getConstructor(int.class), "Obj", List.of("w")
                 )
                 .setClassNamePattern("test3_expr")
                 .build();

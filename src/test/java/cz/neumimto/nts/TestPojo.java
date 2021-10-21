@@ -14,6 +14,10 @@ public class TestPojo {
 
     }
 
+    public TestPojo(int w) {
+        System.out.println(w);
+    }
+
     public void setPrivateField(double privateField) {
         this.privateField = privateField;
     }
