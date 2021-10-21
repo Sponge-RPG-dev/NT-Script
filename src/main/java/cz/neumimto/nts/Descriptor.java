@@ -15,4 +15,13 @@ public class Descriptor {
         this.functionName = functionName;
         this.injectedViaField = injectedViaField;
     }
+
+    @Override
+    public String toString() {
+        return "Descriptor{" +
+                ", functionName='" + functionName +
+                ", namedParams=" + namedParams + '\'' +
+                ", injectedViaField=" + injectedViaField +
+                '}';
+    }
 }

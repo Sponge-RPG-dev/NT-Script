@@ -55,16 +55,17 @@ assignment_values : rval
 
 rval : type_literal
      | type_double
+
+     | left=rval op=(MUL | DIV)  right=rval
+     | left=rval op=(PLUS | MINUS)  right=rval
+     | '(' rval ')'
+
      | function_call
      | type_enum
      | type_bool
      | variable_reference
      | type_comparison
      | getField_statement
-
-    // | '(' rval ')'
-     | left=rval op=(MUL | DIV ) right=rval
-     | left=rval op=(PLUS | MINUS ) right=rval
 
      ;
 

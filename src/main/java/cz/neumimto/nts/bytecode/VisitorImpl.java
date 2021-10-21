@@ -1,12 +1,9 @@
 package cz.neumimto.nts.bytecode;
 
 import cz.neumimto.nts.*;
-import cz.neumimto.nts.annotations.ScriptMeta;
 import net.bytebuddy.description.enumeration.EnumerationDescription;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.bytecode.*;
 import net.bytebuddy.implementation.bytecode.constant.*;
 import net.bytebuddy.implementation.bytecode.member.FieldAccess;
@@ -14,11 +11,8 @@ import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodReturn;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import net.bytebuddy.jar.asm.Label;
-import net.bytebuddy.jar.asm.MethodVisitor;
 import net.bytebuddy.matcher.ElementMatchers;
-import net.bytebuddy.utility.JavaConstant;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.lang.reflect.*;
@@ -186,6 +180,11 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     }
 
     @Override
+    public ScriptContext visitTerminal(TerminalNode node) {
+        return super.visitTerminal(node);
+    }
+
+    @Override
     public ScriptContext visitRval(ntsParser.RvalContext ctx) {
         if (ctx.left == null) {
             visitChildren(ctx);
@@ -294,7 +293,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                 String name = argument.name.getText();
 
 
-                visitChildren(value);
+                visit(value);
 
                 //typecasts
                 //todo this should be better, maybe keep track of last loaded offset on the stack and eventually cast

@@ -26,8 +26,8 @@ public class FnVisitor extends ntsBaseVisitor {
         if (!lambdas.contains("@" + fnName)) {
             if (context.stream()
                     .filter(a-> a instanceof Descriptor)
-                    .map(a->((Descriptor) a).executable)
-                    .noneMatch(a->a.getName().equalsIgnoreCase(fnName))) {
+                    .filter(a->((Descriptor) a).injectedViaField)
+                    .noneMatch(a->((Descriptor) a).functionName.equalsIgnoreCase(fnName))) {
 
                 functions.add(fnName);
             }

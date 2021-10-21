@@ -228,14 +228,10 @@ public class Tests {
     @org.junit.jupiter.api.Test
     public void test4_lib() throws Throwable {
         String test = """
-                @k = 20
-                @k = max{a=@k ,b=8}
-                print{int=@k}
-                @pojo = obj{w=@k}
-                
-                @l = random{} * 0.4 - 0.2
-                @print{int=@l}
-                RETURN Result.OK
+               @l=random{} * 0.4 - 0.2
+               print{int=@l}
+               print{int=random{} * 0.4 - 0.2}
+               RETURN Result.OK
                 """;
         NTScript script = new NTScript.Builder()
                 .package_("cz.neumimto.test")
@@ -251,7 +247,7 @@ public class Tests {
                 .add(
                         TestPojo.class.getConstructor(int.class), "Obj", List.of("w")
                 )
-                .setClassNamePattern("test3_expr")
+                .setClassNamePattern("test4_lib")
                 .build();
 
         Class aClass = script.compile(test);

@@ -6,17 +6,11 @@ import java.util.function.Consumer;
 
 public class Test1Decom implements ImplTargets.Subclass {
 
+    private P P;
 
     @Override
     public Tests.Result run(Input input, Context context) {
-
-        double a = new Random().nextDouble();
-        double b = new Random().nextDouble();
-        double c = new Random().nextDouble();
-        double d = new Random().nextDouble();
-
-        double k = -a * (b/c) - d;
-        System.out.println(k);
+        P.print(Math.random() * 0.4 - 0.2, null);
         return Tests.Result.OK;
     }
 
