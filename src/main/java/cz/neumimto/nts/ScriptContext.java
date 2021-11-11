@@ -2,7 +2,9 @@ package cz.neumimto.nts;
 
 import cz.neumimto.nts.annotations.ScriptMeta;
 import cz.neumimto.nts.bytecode.Variable;
+import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
 import java.lang.reflect.*;
@@ -163,7 +165,8 @@ public class ScriptContext {
         } else if (rval.variable_reference() != null) {
             return MethodVariableAccess.of(new TypeDescription.ForLoadedType(currentScope().variables.get(rval.getText()).getRuntimeType()));
         } else if (rval.getField_statement() != null) {
-            Variable variable = currentScope().variables.get(rval.getField_statement().fieldOwner.getText());
+            String fieldOwnerVar = rval.getField_statement().fieldOwner.getText();
+            Variable variable = currentScope().variables.get(fieldOwnerVar);
 
             String fName = rval.getField_statement().field.getText();
 
@@ -174,6 +177,23 @@ public class ScriptContext {
                     return MethodVariableAccess.of(new TypeDescription.ForLoadedType(f.getType()));
                 }
             }
+
+            Optional<Variable> o = getVariable(fieldOwnerVar);
+            if (o.isEmpty()) {
+                throw new RuntimeException("Unknown variabble " + fieldOwnerVar);
+            }
+            String fieldName = rval.getField_statement().field.getText();
+            for (Method declaredMethod : o.get().getRuntimeType().getDeclaredMethods()) {
+                if (Modifier.isPublic(declaredMethod.getModifiers())) {
+                    if (declaredMethod.getParameters().length == 0) {
+                        String mName = declaredMethod.getName();
+                        if (mName.equalsIgnoreCase(fieldName) || mName.equalsIgnoreCase("get"+fieldName)) {
+                            return MethodVariableAccess.of(new TypeDescription.ForLoadedType(declaredMethod.getReturnType()));
+                        }
+                    }
+                }
+            }
+
         } else if (rval.op != null || containsArithmeticalSign(rval.getText())){
             return MethodVariableAccess.DOUBLE;
         }
@@ -214,7 +234,8 @@ public class ScriptContext {
         } else if (rval.type_comparison() != null) {
             return double.class;
         } else if (rval.getField_statement() != null) {
-            Variable variable = currentScope().variables.get(rval.getField_statement().fieldOwner.getText());
+            String fieldOwnerVar = rval.getField_statement().fieldOwner.getText();
+            Variable variable = currentScope().variables.get(fieldOwnerVar);
 
             String fName = rval.getField_statement().field.getText();
 
@@ -225,6 +246,24 @@ public class ScriptContext {
                     return f.getType();
                 }
             }
+
+            Optional<Variable> o = getVariable(fieldOwnerVar);
+            if (o.isEmpty()) {
+                throw new RuntimeException("Unknown variabble " + fieldOwnerVar);
+            }
+            String fieldName = rval.getField_statement().field.getText();
+            for (Method declaredMethod : o.get().getRuntimeType().getDeclaredMethods()) {
+                if (Modifier.isPublic(declaredMethod.getModifiers())) {
+                    if (declaredMethod.getParameters().length == 0) {
+                        String mName = declaredMethod.getName();
+                        if (mName.equalsIgnoreCase(fieldName) || mName.equalsIgnoreCase("get"+fieldName)) {
+                            return declaredMethod.getReturnType();
+                        }
+                    }
+                }
+            }
+
+
         } else if (rval.op != null ||ScriptContext.containsArithmeticalSign(rval.getText())) {
             return double.class;
         }

@@ -297,7 +297,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
                 //typecasts
                 //todo this should be better, maybe keep track of last loaded offset on the stack and eventually cast
-                if (parameter.getType() != double.class && parameter.getType().isPrimitive()) {
+                if (parameter.getType() != double.class && parameter.getType().isPrimitive() && parameter.getType() != boolean.class) {
                     addInsn(TypeCasts.castDoubleTo(parameter.getType()));
                 }
                 Variable c = scriptContext.currentScope().lastVariableOnStack;

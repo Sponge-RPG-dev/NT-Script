@@ -129,6 +129,37 @@ public class Tests {
     }
 
     @org.junit.jupiter.api.Test
+    public void test_if() throws Throwable {
+        String test = """
+                @damage = $settings.r
+        
+                
+            IF damage{damager=@caster, target=@entity, damage=@damage, knockback=F, skill=@this_skill}
+               lightning{at_entity=@entity}
+            END
+                
+        
+                RETURN Result.OK
+                """;
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(ImplTargets.class)
+                .withEnum(Result.class)
+                .add(List.of(new TestFunctions()))
+                .add(DecompileTest.class)
+                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "config_value{context=@context, key=\"$1\"}")
+                .setClassNamePattern("aaa")
+                .build();
+
+        Class aClass = script.compile(test);
+        ImplTargets o = (ImplTargets) aClass.newInstance();
+        initAndRun(o);
+        o.damage(new ImplTargets.IEntity(), new ImplTargets.IEntity(), 20,20, ImplTargets.EntityDamageEvent.DamageCause.OK, null);
+
+    }
+
+    @org.junit.jupiter.api.Test
     public void test1() throws Throwable {
         String test = """
                 @d = $settings.d

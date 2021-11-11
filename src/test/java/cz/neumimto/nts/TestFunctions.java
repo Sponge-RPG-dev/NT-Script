@@ -28,13 +28,30 @@ public class TestFunctions {
 
     @ScriptMeta.Function("compare")
     @ScriptMeta.Handler
-    public boolean compare(@ScriptMeta.NamedParam("e") Number n, @ScriptMeta.NamedParam("v|value") double k) {
-        return n.doubleValue() < k;
+    public boolean compare(@ScriptMeta.NamedParam("e") double n, @ScriptMeta.NamedParam("v|value") double k) {
+        return n < k;
     }
 
     @ScriptMeta.Function("print")
     @ScriptMeta.Handler
     public void print(@ScriptMeta.NamedParam("e") Number n) {
         System.out.println(n);
+    }
+
+    @ScriptMeta.Function("damage")
+    @ScriptMeta.Handler
+    public boolean damage(@ScriptMeta.NamedParam("damager")  Input damager,
+                          @ScriptMeta.NamedParam("target") Input target,
+                          @ScriptMeta.NamedParam("damage") double damage,
+                          @ScriptMeta.NamedParam("k") boolean k,
+                          @ScriptMeta.NamedParam("s") Object o
+                          ) {
+        return true;
+    }
+
+    @ScriptMeta.Function("lightning")
+    @ScriptMeta.Handler
+    public void damage(@ScriptMeta.NamedParam("at_entity")  Input damager) {
+
     }
 }

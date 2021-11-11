@@ -2,6 +2,7 @@ package cz.neumimto.nts;
 
 import java.util.Collection;
 import java.util.Random;
+import java.util.Vector;
 import java.util.function.Consumer;
 
 public class Test1Decom implements ImplTargets.Subclass {
@@ -14,4 +15,12 @@ public class Test1Decom implements ImplTargets.Subclass {
         return Tests.Result.OK;
     }
 
+    @Override
+    public boolean damage(IEntity target, IEntity damager, double damage, double knockback, EntityDamageEvent.DamageCause cause, ISkill e) {
+        W w = new W(10, 20, target);
+        System.out.println(w);
+        return true;
+    }
+
+    public record W(int i, int b, IEntity target){}
 }
