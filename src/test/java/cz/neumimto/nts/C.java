@@ -2,11 +2,11 @@ package cz.neumimto.nts;
 
 import static cz.neumimto.nts.annotations.ScriptMeta.*;
 
-@Function("test")
 public class C {
 
     @Handler
-    public boolean c(@NamedParam("int") double q, @NamedParam("string") String s) {
+    @Function("test")
+    public boolean c(@NamedParam("int") double q, @NamedParam("pojo") TestPojo d, @NamedParam("float") float w,@NamedParam("string") String s) {
         return q < 100;
     }
 }

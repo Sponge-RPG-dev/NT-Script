@@ -9,6 +9,9 @@ public class TestPojo {
     public int intField;
 
     private double privateField;
+
+    private float floatField;
+
     @ScriptMeta.Handler
     public TestPojo() {
 
@@ -26,4 +29,7 @@ public class TestPojo {
         return privateField;
     }
 
+    public float getFloatField() {
+        return floatField;
+    }
 }

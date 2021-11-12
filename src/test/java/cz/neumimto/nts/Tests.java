@@ -4,6 +4,7 @@ import cz.neumimto.nts.annotations.ScriptMeta;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Executable;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -96,7 +97,7 @@ public class Tests {
                 .withEnum(Result.class)
                 .add(List.of(new A(), new B(), new C(), new L(), new MP(), new P()))
                 .add(DecompileTest.class)
-                .setClassNamePattern("aaa")
+                .setClassNamePattern("test_syntax")
                 .build();
 
         Class aClass = script.compile(k);
@@ -126,37 +127,6 @@ public class Tests {
         Class aClass = script.compile(test);
         Object o = aClass.newInstance();
         initAndRun(o);
-    }
-
-    @org.junit.jupiter.api.Test
-    public void test_if() throws Throwable {
-        String test = """
-                @damage = $settings.r
-        
-                
-            IF damage{damager=@caster, target=@entity, damage=@damage, knockback=F, skill=@this_skill}
-               lightning{at_entity=@entity}
-            END
-                
-        
-                RETURN Result.OK
-                """;
-        NTScript script = new NTScript.Builder()
-                .package_("cz.neumimto.test")
-                .debugOutput("/tmp/test")
-                .implementingType(ImplTargets.class)
-                .withEnum(Result.class)
-                .add(List.of(new TestFunctions()))
-                .add(DecompileTest.class)
-                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "config_value{context=@context, key=\"$1\"}")
-                .setClassNamePattern("aaa")
-                .build();
-
-        Class aClass = script.compile(test);
-        ImplTargets o = (ImplTargets) aClass.newInstance();
-        initAndRun(o);
-        o.damage(new ImplTargets.IEntity(), new ImplTargets.IEntity(), 20,20, ImplTargets.EntityDamageEvent.DamageCause.OK, null);
-
     }
 
     @org.junit.jupiter.api.Test
@@ -193,6 +163,34 @@ public class Tests {
     }
 
     @org.junit.jupiter.api.Test
+    public void test_if() throws Throwable {
+        String test = """
+                @d = $settings.d
+                             
+                IF compare{e=@d, v=5}
+                   print{e=@d}
+                END
+        
+                RETURN Result.OK
+                """;
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(ImplTargets.Subclass.class)
+                .withEnum(Result.class)
+                .add(List.of(new TestFunctions()))
+                .add(DecompileTest.class)
+                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "config_value{context=@context, key=\"$1\"}")
+                .setClassNamePattern("test_if")
+                .build();
+
+        Class aClass = script.compile(test);
+        ImplTargets.Subclass o = (ImplTargets.Subclass) aClass.newInstance();
+        initAndRun(o);
+        o.run(new Input(), new Context());
+    }
+
+    @org.junit.jupiter.api.Test
     public void test2_put_get_field() throws Throwable {
         String test = """
                 @k = 20
@@ -211,7 +209,8 @@ public class Tests {
                 .debugOutput("/tmp/test")
                 .implementingType(ImplTargets.Subclass.class)
                 .withEnum(Result.class)
-                .add(TestPojo.class)
+                .add(new TestPojo())
+                .add(TestPojo.class.getConstructor(), "TestPojo", Collections.emptyList())
                 .setClassNamePattern("test2_putfield")
                 .build();
 
@@ -287,6 +286,31 @@ public class Tests {
         o.run(new Input(), new Context());
     }
 
+    @org.junit.jupiter.api.Test
+    public void test5_read_primitive_and_ref() throws Throwable {
+        String test = """
+               @l=20
+               @obj = TestPojo{}
+               @float = @obj.floatField
+               test{pojo=@obj, float=@float}
+               RETURN Result.OK
+                """;
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(ImplTargets.Subclass.class)
+                .withEnum(Result.class)
+                .add(new C())
+                .add(TestPojo.class)
+                .add(TestPojo.class.getConstructor(int.class), "Obj", List.of("w"))
+                .setClassNamePattern("test5_read_primitive_and_ref")
+                .build();
+
+        Class aClass = script.compile(test);
+        ImplTargets.Subclass o = (ImplTargets.Subclass) aClass.newInstance();
+        initAndRun(o);
+        o.run(new Input(), new Context());
+    }
 
     private void initAndRun(Object o) {
         try {

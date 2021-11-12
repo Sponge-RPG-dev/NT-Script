@@ -2,27 +2,21 @@ package cz.neumimto.nts.bytecode;
 
 import cz.neumimto.nts.Scope;
 import cz.neumimto.nts.ScriptContext;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.method.MethodList;
-import net.bytebuddy.description.method.ParameterDescription;
-import net.bytebuddy.description.method.ParameterList;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
-import net.bytebuddy.implementation.bytecode.StackSize;
-import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.jar.asm.Handle;
 import net.bytebuddy.jar.asm.MethodVisitor;
 import net.bytebuddy.jar.asm.Opcodes;
 import net.bytebuddy.jar.asm.Type;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.lang.invoke.*;
+import java.lang.invoke.LambdaMetafactory;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class InvokeDynamic implements StackManipulation {
 

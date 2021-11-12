@@ -173,7 +173,7 @@ public class ScriptContext {
             Field[] fields = variable.getRuntimeType().getDeclaredFields();
 
             for (Field f : fields) {
-                if (f.isAccessible()) {
+                if (Modifier.isPublic(f.getModifiers())) {
                     if (f.getName().equalsIgnoreCase(fName)) {
                         return MethodVariableAccess.of(new TypeDescription.ForLoadedType(f.getType()));
                     }
@@ -244,7 +244,7 @@ public class ScriptContext {
             Field[] fields = variable.getRuntimeType().getDeclaredFields();
 
             for (Field f : fields) {
-                if (f.isAccessible()) {
+                if (Modifier.isPublic(f.getModifiers())) {
                     if (f.getName().equalsIgnoreCase(fName)) {
                         return f.getType();
                     }

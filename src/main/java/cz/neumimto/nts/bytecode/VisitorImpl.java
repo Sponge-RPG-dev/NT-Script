@@ -111,7 +111,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                 throw new NoSuchFieldException();
             }
             if (c != null && c.getRuntimeType() != field.getType() && c.getRuntimeType().isPrimitive()) {
-                addInsn(TypeCasts.castDoubleTo(field.getType()));
+                addInsn(TypeCasts.castPrimitive(c.getRuntimeType(), field.getType()));
             }
 
             addInsn(FieldAccess.forField(new FieldDescription.InDefinedShape.ForLoadedField(field)).write());
@@ -297,14 +297,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
                 //typecasts
                 //todo this should be better, maybe keep track of last loaded offset on the stack and eventually cast
-                if (parameter.getType() != double.class && parameter.getType().isPrimitive() && parameter.getType() != boolean.class) {
-                    addInsn(TypeCasts.castDoubleTo(parameter.getType()));
-                }
-                Variable c = scriptContext.currentScope().lastVariableOnStack;
-                if (c != null && c.getRuntimeType() != parameter.getType() && c.getGenericType() != null) {
-                    addInsn(TypeCasts.checkCast(c.getGenericType()));
-                }
-                scriptContext.currentScope().lastVariableOnStack = null;
+                handleTypecasts(parameter);
             }
         }
 
@@ -336,6 +329,58 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         }
 
         return scriptContext;
+    }
+
+    private void handleTypecasts(Parameter parameter) {
+        Variable c = scriptContext.currentScope().lastVariableOnStack;
+        Class rType = c == null ? null : c.getRuntimeType();
+
+        StackManipulation stackManipulation = getImpl().currentScope().impl.get(getImpl().currentScope().impl.size() - 1);
+        if (stackManipulation.toString().contains("DoubleConstant")) {
+            rType = double.class;
+        }
+        if (rType == null) {
+            return;
+        }
+
+        if (parameter.getType() == boolean.class) {
+            return;
+        }
+
+        if (rType == boolean.class) {
+            scriptContext.currentScope().lastVariableOnStack = null;
+            return;
+        }
+
+        if (parameter.getType().isPrimitive() && rType.isPrimitive()) {
+            if (parameter.getType() != rType) {
+                TypeCasts.Cast cast = TypeCasts.castPrimitive(rType, parameter.getType());
+                addInsn(cast);
+            }
+        }
+
+        if (rType != parameter.getType() && c!=null&& c.getGenericType() != null) {
+            addInsn(TypeCasts.checkCast(c.getGenericType()));
+        }
+        if (Number.class.isAssignableFrom(rType)) {
+            try {
+                MethodInvocation.WithImplicitInvocationTargetType v = null;
+                if (parameter.getType() == int.class) {
+                    v = MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(Number.class.getDeclaredMethod("intValue")));
+                } else if (parameter.getType() == double.class) {
+                    v = MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(Number.class.getDeclaredMethod("doubleValue")));
+                } else if (parameter.getType() == float.class) {
+                    v = MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(Number.class.getDeclaredMethod("floatValue")));
+                } else if (parameter.getType() == long.class) {
+                    v = MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(Number.class.getDeclaredMethod("longValue")));
+                }
+                addInsn(v);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        scriptContext.currentScope().lastVariableOnStack = null;
     }
 
     @Override

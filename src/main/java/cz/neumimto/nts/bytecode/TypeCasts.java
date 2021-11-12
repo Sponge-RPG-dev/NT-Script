@@ -7,21 +7,27 @@ import net.bytebuddy.jar.asm.MethodVisitor;
 import net.bytebuddy.jar.asm.Opcodes;
 import net.bytebuddy.jar.asm.Type;
 
+import java.lang.reflect.Field;
+
 public interface TypeCasts {
 
-    Cast DOUBLE_TO_INT = new Cast(Opcodes.D2I);
-    Cast DOUBLE_TO_FLOAT = new Cast(Opcodes.D2F);
-    Cast DOUBLE_TO_LONG = new Cast(Opcodes.D2L);
-
-    static Cast castDoubleTo(Class<?> type) {
-        if (type == int.class) {
-            return DOUBLE_TO_INT;
-        } else if (type == float.class) {
-            return DOUBLE_TO_FLOAT;
-        } else if (type == long.class) {
-            return DOUBLE_TO_LONG;
+    static Cast castPrimitive(Class<?> actual, Class<?> target) {
+        String from = Type.getDescriptor(actual);
+        String to = Type.getDescriptor(target);
+        if (target == long.class) { //long is J, but there are only D2L,... opcodes
+            to = "L";
         }
-        throw new RuntimeException("Cannot typecast primitive double to " + type.getName());
+        if (actual == long.class) {
+            from = "L";
+        }
+        try {
+            int castInsn = (int) Opcodes.class.getField(from + "2" + to).get(null);
+            return new Cast(castInsn);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     static StackManipulation checkCast(Class c) {
@@ -39,7 +45,7 @@ public interface TypeCasts {
         };
     }
 
-    static class Cast implements StackManipulation {
+    class Cast implements StackManipulation {
 
         private final int opcode;
 

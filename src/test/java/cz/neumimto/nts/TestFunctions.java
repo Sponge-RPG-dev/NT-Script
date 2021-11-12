@@ -34,15 +34,15 @@ public class TestFunctions {
 
     @ScriptMeta.Function("print")
     @ScriptMeta.Handler
-    public void print(@ScriptMeta.NamedParam("e") Number n) {
+    public void print(@ScriptMeta.NamedParam("e") long n) {
         System.out.println(n);
     }
 
-    @ScriptMeta.Function("damage")
+    @ScriptMeta.Function("d")
     @ScriptMeta.Handler
-    public boolean damage(@ScriptMeta.NamedParam("damager")  Input damager,
+    public boolean damage(@ScriptMeta.NamedParam("da")  Input damager,
                           @ScriptMeta.NamedParam("target") Input target,
-                          @ScriptMeta.NamedParam("damage") double damage,
+                          @ScriptMeta.NamedParam("d") double damage,
                           @ScriptMeta.NamedParam("k") boolean k,
                           @ScriptMeta.NamedParam("s") Object o
                           ) {
