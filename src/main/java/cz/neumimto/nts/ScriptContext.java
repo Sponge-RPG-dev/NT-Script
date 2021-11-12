@@ -173,8 +173,10 @@ public class ScriptContext {
             Field[] fields = variable.getRuntimeType().getDeclaredFields();
 
             for (Field f : fields) {
-                if (f.getName().equalsIgnoreCase(fName)) {
-                    return MethodVariableAccess.of(new TypeDescription.ForLoadedType(f.getType()));
+                if (f.isAccessible()) {
+                    if (f.getName().equalsIgnoreCase(fName)) {
+                        return MethodVariableAccess.of(new TypeDescription.ForLoadedType(f.getType()));
+                    }
                 }
             }
 
@@ -242,8 +244,10 @@ public class ScriptContext {
             Field[] fields = variable.getRuntimeType().getDeclaredFields();
 
             for (Field f : fields) {
-                if (f.getName().equalsIgnoreCase(fName)) {
-                    return f.getType();
+                if (f.isAccessible()) {
+                    if (f.getName().equalsIgnoreCase(fName)) {
+                        return f.getType();
+                    }
                 }
             }
 
