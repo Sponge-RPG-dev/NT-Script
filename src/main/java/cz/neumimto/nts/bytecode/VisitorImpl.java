@@ -67,6 +67,11 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         String variableName = ctx.fieldOwner.getText();
 
         Variable c = scriptContext.currentScope().lastVariableOnStack;
+
+        //when we accessing function param
+        if (c == null) {
+            c = scriptContext.currentScope().findVariable(ctx.fieldOwner.getText());
+        }
         Variable fieldOwner = scriptContext.getVariable(variableName).get();
 
         try {
