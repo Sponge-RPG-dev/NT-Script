@@ -108,6 +108,10 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
         visitChildren(ctx.rval());
         Variable c = scriptContext.currentScope().lastVariableOnStack;
+        if (c == null) {
+            c = scriptContext.currentScope().findVariable(ctx.fieldOwner.getText());
+        }
+
         Variable fieldOwner = scriptContext.getVariable(variableName).get();
         try {
             Field field = fieldOwner.getRuntimeType().getDeclaredField(fieldName);
