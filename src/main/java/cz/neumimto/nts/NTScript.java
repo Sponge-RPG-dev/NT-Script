@@ -13,6 +13,7 @@ import net.bytebuddy.description.field.FieldList;
 import net.bytebuddy.description.method.MethodList;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.dynamic.scaffold.InstrumentedType;
 import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.bytecode.ByteCodeAppender;
@@ -228,7 +229,10 @@ public class NTScript {
                 e.printStackTrace();
             }
         }
-        return make.load(this.getClass().getClassLoader()).getLoaded();
+
+        return make
+                .load(this.getClass().getClassLoader(), ClassLoadingStrategy.Default.INJECTION)
+                .getLoaded();
     }
 
     private Implementation getImplementation(VisitorImpl visitor) {
@@ -312,6 +316,7 @@ public class NTScript {
         private String debugOutput;
         private Map<Pattern, String> macros = new LinkedHashMap<>();
         private Consumer<String> loggerDataProvider;
+        private Map<String, Class<?>> overridedVarTypes = new HashMap<>();
 
         public Builder logging(Consumer<String> o) {
             loggerDataProvider = o;

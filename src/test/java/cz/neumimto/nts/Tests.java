@@ -153,7 +153,7 @@ public class Tests {
                 .add(List.of(new TestFunctions()))
                 .add(DecompileTest.class)
                 .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "config_value{context=@context, key=\"$1\"}")
-                .setClassNamePattern("aaa")
+                .setClassNamePattern("test1")
                 .build();
 
         Class aClass = script.compile(test);
