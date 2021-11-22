@@ -75,14 +75,14 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         Variable fieldOwner = scriptContext.getVariable(variableName).get();
 
         try {
-            Field field = fieldOwner.getRuntimeType().getDeclaredField(fieldName);
+            Field field = fieldOwner.getRuntimeType().getField(fieldName);
             if (!Modifier.isPublic(field.getModifiers())) {
                 throw new NoSuchFieldException();
             }
             addInsn(FieldAccess.forField(new FieldDescription.InDefinedShape.ForLoadedField(field)).read());
             return scriptContext;
         } catch (NoSuchFieldException e) {
-            Method[] declaredMethods = fieldOwner.getRuntimeType().getDeclaredMethods();
+            Method[] declaredMethods = fieldOwner.getRuntimeType().getMethods();
             for (Method declaredMethod : declaredMethods) {
                 if (Modifier.isPublic(declaredMethod.getModifiers())) {
                     if (declaredMethod.getParameters().length == 0) {
@@ -114,7 +114,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
         Variable fieldOwner = scriptContext.getVariable(variableName).get();
         try {
-            Field field = fieldOwner.getRuntimeType().getDeclaredField(fieldName);
+            Field field = fieldOwner.getRuntimeType().getField(fieldName);
 
             if (!Modifier.isPublic(field.getModifiers())) {
                 throw new NoSuchFieldException();
@@ -127,7 +127,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             return scriptContext;
         } catch (NoSuchFieldException e) {
             //assume setter
-            Method[] declaredMethods = fieldOwner.getRuntimeType().getDeclaredMethods();
+            Method[] declaredMethods = fieldOwner.getRuntimeType().getMethods();
             for (Method declaredMethod : declaredMethods) {
                 if (Modifier.isPublic(declaredMethod.getModifiers())) {
                     if (declaredMethod.getParameters().length == 1) {
