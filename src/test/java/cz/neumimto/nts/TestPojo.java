@@ -12,9 +12,19 @@ public class TestPojo {
 
     private float floatField;
 
+    private long longTypeField;
+
     @ScriptMeta.Handler
     public TestPojo() {
 
+    }
+
+    public long getLongTypeField() {
+        return longTypeField;
+    }
+
+    public void setLongTypeField(long longTypeField) {
+        this.longTypeField = longTypeField;
     }
 
     public TestPojo(int w) {

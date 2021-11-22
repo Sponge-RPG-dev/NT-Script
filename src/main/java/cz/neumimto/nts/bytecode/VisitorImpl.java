@@ -133,6 +133,11 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                     if (declaredMethod.getParameters().length == 1) {
                         String mName = declaredMethod.getName();
                         if (mName.equalsIgnoreCase(fieldName) || mName.equalsIgnoreCase("set"+fieldName)) {
+                            Class<?> type = declaredMethod.getParameters()[0].getType();
+                            if (c != null && c.getRuntimeType() !=  type && c.getRuntimeType().isPrimitive()) {
+                                addInsn(TypeCasts.castPrimitive(c.getRuntimeType(), type));
+                            }
+
                             addInsn(MethodInvocation.invoke(new MethodDescription.ForLoadedMethod(declaredMethod)));
                             return scriptContext;
                         }

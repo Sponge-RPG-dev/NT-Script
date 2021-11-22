@@ -198,6 +198,7 @@ public class Tests {
                 @obj.intField = @k
                 @obj.doubleField = @k
                 @obj.privateField = @k
+                @obj.longTypeField = @k
                 
                 @get = @obj.doubleField
                 @get_typecasted = @obj.intField

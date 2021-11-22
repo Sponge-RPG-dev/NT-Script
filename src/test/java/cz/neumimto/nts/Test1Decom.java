@@ -15,12 +15,16 @@ public class Test1Decom implements ImplTargets.Subclass {
         return Tests.Result.OK;
     }
 
-    @Override
-    public boolean damage(IEntity target, IEntity damager, double damage, double knockback, EntityDamageEvent.DamageCause cause, ISkill e) {
-        W w = new W(10, 20, target);
-        System.out.println(w);
+    public boolean a(IEntity t, IEntity d, double k) {
+        TestPojo testPojo = new TestPojo();
+        testPojo.setLongTypeField((long) k);
+
         return true;
     }
 
-    public record W(int i, int b, IEntity target){}
+
+    @Override
+    public boolean damage(IEntity target, IEntity damager, double damage, double knockback, EntityDamageEvent.DamageCause cause, ISkill e) {
+        return false;
+    }
 }
