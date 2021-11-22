@@ -26,6 +26,7 @@ public class ScriptContext {
     private Scope current;
     private final Collection<Descriptor> mechanics;
     private final Set<Class<?>> enums;
+    private final Set<Class<?>> typesSimpleName = new HashSet<>();;
     private TypeDescription insnType;
 
     public ScriptContext(LinkedHashMap<String, Variable> variables, Collection<Object> mechanics, Set<Class<?>> enums, Consumer<String> loggerDataProvider) {
@@ -41,12 +42,14 @@ public class ScriptContext {
 
         outer: for (Object mechanic : mechanics) {
 
+
             if (mechanic instanceof Descriptor de) {
                 d.add(de);
                 continue;
             }
 
             if (mechanic instanceof Class<?> c) {
+                typesSimpleName.add(c);
                 String i = "";
                 if (c.isAnnotationPresent(Function.class)) {
                     i += c.getAnnotation(Function.class).value();
@@ -222,10 +225,31 @@ public class ScriptContext {
         } else if (rval.function_call() != null) {
             String fnName = rval.function_call().function_name.getText();
             Executable executableElement = findExecutableElement(fnName).executable;
+
             if (executableElement instanceof Method m) {
                 if (m.getReturnType() == void.class) {
                     return null;
                 }
+
+                if (rval.function_call().type_cast != null) {
+                    String text = rval.function_call().type_cast.getText();
+                    Optional<Descriptor> first = mechanics.stream().filter(a -> a.getClass().getSimpleName().equalsIgnoreCase(text)).findFirst();
+                    if (first.isPresent()) {
+                        Descriptor descriptor = first.get();
+                        return descriptor.executable.getClass();
+                    } else {
+                        Class typeBySimpleName = findTypeBySimpleName(text);
+                        if (typeBySimpleName != null) {
+                            return typeBySimpleName;
+                        }
+                        try {
+                            return Class.forName(text);
+                        } catch (ClassNotFoundException e) {
+                            log("Unknown type " + text);
+                        }
+                    }
+                }
+
                 return m.getReturnType();
             }
             return null;
@@ -242,6 +266,21 @@ public class ScriptContext {
             String fName = rval.getField_statement().field.getText();
 
             Field[] fields = variable.getRuntimeType().getDeclaredFields();
+
+            if (rval.getField_statement().type_cast != null) {
+                String text = rval.getField_statement().type_cast.getText();
+                Optional<Descriptor> first = mechanics.stream().filter(a -> a.getClass().getSimpleName().equalsIgnoreCase(text)).findFirst();
+                if (first.isPresent()) {
+                    Descriptor descriptor = first.get();
+                    return descriptor.executable.getClass();
+                } else {
+                    try {
+                        return Class.forName(text);
+                    } catch (ClassNotFoundException e) {
+                        log("Unknown type " + text);
+                    }
+                }
+            }
 
             for (Field f : fields) {
                 if (Modifier.isPublic(f.getModifiers())) {
@@ -323,4 +362,16 @@ public class ScriptContext {
         }
     }
 
+    public Class findTypeBySimpleName(String text) {
+        for (Class<?> aClass : typesSimpleName) {
+            if (aClass.getSimpleName().equalsIgnoreCase(text)) {
+                return aClass;
+            }
+        }
+        try {
+            return Class.forName(text);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Unknown type " + text);
+        }
+    }
 }

@@ -13,6 +13,7 @@ import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import net.bytebuddy.jar.asm.Label;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.lang.reflect.*;
@@ -340,6 +341,13 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             if (method.getReturnType() != void.class && ctx.getParent() instanceof ntsParser.StatementContext) {
                 addInsn(Removal.SINGLE);
             }
+        }
+
+        Token type_cast = ctx.type_cast;
+        if (type_cast != null) {
+            String text = type_cast.getText();
+            Class typeBySimpleName = scriptContext.findTypeBySimpleName(text);
+            addInsn(TypeCasts.checkCast(typeBySimpleName));
         }
 
         return scriptContext;

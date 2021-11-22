@@ -40,8 +40,8 @@ comparable_expr : type_bool
 variable_reference : variable=VARIABLE_IDENTIFIER ;
 
 
-putField_statement :  fieldOwner=variable_reference '.' field=IDENTIFIER '=' value=rval ;
-getField_statement : fieldOwner=variable_reference '.' field=IDENTIFIER;
+putField_statement : fieldOwner=variable_reference '.' field=IDENTIFIER '=' value=rval ;
+getField_statement : fieldOwner=variable_reference '.' field=IDENTIFIER ('as' type_cast= IDENTIFIER)?;
 
 assignment_statement : name=VARIABLE_IDENTIFIER '=' value=assignment_values ;
 
@@ -76,7 +76,7 @@ iterable :
 
 type_enum : type=IDENTIFIER '.' value=IDENTIFIER ;
 
-function_call : function_name=IDENTIFIER arguments='{'argument? (',' argument)* '}';
+function_call : function_name=IDENTIFIER arguments='{'argument? (',' argument)* '}' ('as' type_cast= IDENTIFIER)?;
 
 if_statement : IF condition_expression terminator statement_list END ;
 

@@ -316,7 +316,6 @@ public class NTScript {
         private String debugOutput;
         private Map<Pattern, String> macros = new LinkedHashMap<>();
         private Consumer<String> loggerDataProvider;
-        private Map<String, Class<?>> overridedVarTypes = new HashMap<>();
 
         public Builder logging(Consumer<String> o) {
             loggerDataProvider = o;

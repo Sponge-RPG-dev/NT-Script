@@ -313,6 +313,30 @@ public class Tests {
         o.run(new Input(), new Context());
     }
 
+    @org.junit.jupiter.api.Test
+    public void test6_typecasts() throws Exception {
+        String test = """
+               @obj = iface{} as A
+               @obj.k = 50
+               RETURN Result.OK
+                """;
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(ImplTargets.Subclass.class)
+                .withEnum(Result.class)
+                .add(C.I.class)
+                .add(C.A.class)
+                .add(new C())
+                .setClassNamePattern("test6_typecasts")
+                .build();
+
+        Class aClass = script.compile(test);
+        ImplTargets.Subclass o = (ImplTargets.Subclass) aClass.newInstance();
+        initAndRun(o);
+        o.run(new Input(), new Context());
+    }
+
     private void initAndRun(Object o) {
         try {
             o.getClass().getDeclaredField("A").set(o, new A());
