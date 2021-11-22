@@ -367,6 +367,10 @@ public class ScriptContext {
             if (aClass.getSimpleName().equalsIgnoreCase(text)) {
                 return aClass;
             }
+            ScriptMeta.SimpleName annotation = aClass.getAnnotation(ScriptMeta.SimpleName.class);
+            if (annotation != null && annotation.value().equalsIgnoreCase(text)) {
+                return aClass;
+            }
         }
         try {
             return Class.forName(text);

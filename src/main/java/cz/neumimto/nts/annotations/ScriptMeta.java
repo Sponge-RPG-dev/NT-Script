@@ -26,5 +26,11 @@ public interface ScriptMeta {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @interface ScriptTarget {}
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface SimpleName {
+        String value();
+    }
 }
 
