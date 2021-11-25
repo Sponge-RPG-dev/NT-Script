@@ -203,6 +203,9 @@ public class Tests {
                 @get = @obj.doubleField
                 @get_typecasted = @obj.intField
                 @get_getter = @obj.privateField
+                
+                @obj.doubleField = @k - @k 
+                
                 RETURN Result.OK
                 """;
         NTScript script = new NTScript.Builder()

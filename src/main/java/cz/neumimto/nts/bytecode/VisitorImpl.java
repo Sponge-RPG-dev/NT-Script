@@ -107,7 +107,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         addInsn(variable.load());
         String variableName = ctx.fieldOwner.getText();
 
-        visitChildren(ctx.rval());
+        visit(ctx.rval());
         Variable c = scriptContext.currentScope().lastVariableOnStack;
         if (c == null) {
             c = scriptContext.currentScope().findVariable(ctx.fieldOwner.getText());
@@ -201,6 +201,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
     @Override
     public ScriptContext visitRval(ntsParser.RvalContext ctx) {
+        String text = ctx.getText();
         if (ctx.left == null) {
             visitChildren(ctx);
         } else {

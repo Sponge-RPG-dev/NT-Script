@@ -188,7 +188,7 @@ public class ScriptContext {
                 throw new RuntimeException("Unknown variabble " + fieldOwnerVar);
             }
             String fieldName = rval.getField_statement().field.getText();
-            for (Method declaredMethod : o.get().getRuntimeType().getDeclaredMethods()) {
+            for (Method declaredMethod : o.get().getRuntimeType().getMethods()) {
                 if (Modifier.isPublic(declaredMethod.getModifiers())) {
                     if (declaredMethod.getParameters().length == 0) {
                         String mName = declaredMethod.getName();
@@ -295,7 +295,7 @@ public class ScriptContext {
                 throw new RuntimeException("Unknown variabble " + fieldOwnerVar);
             }
             String fieldName = rval.getField_statement().field.getText();
-            for (Method declaredMethod : o.get().getRuntimeType().getDeclaredMethods()) {
+            for (Method declaredMethod : o.get().getRuntimeType().getMethods()) {
                 if (Modifier.isPublic(declaredMethod.getModifiers())) {
                     if (declaredMethod.getParameters().length == 0) {
                         String mName = declaredMethod.getName();
