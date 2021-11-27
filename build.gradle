@@ -15,6 +15,15 @@ repositories {
     mavenCentral()
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
 dependencies {
     antlr 'org.antlr:antlr4:4.9.2' // use ANTLR version 4
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'

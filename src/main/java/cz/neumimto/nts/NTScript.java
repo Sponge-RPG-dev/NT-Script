@@ -266,7 +266,7 @@ public class NTScript {
                 .filter(m -> m.isAnnotationPresent(ScriptMeta.ScriptTarget.class)).findFirst();
 
         if (first.isEmpty()) {
-            throw new RuntimeException("No method annotated with @ScriptTarget");
+            throw new RuntimeException("No method annotated with @ScriptTarget on a class " + implementingType.getName());
         }
         Parameter[] parameters = first.get().getParameters();
 
