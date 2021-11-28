@@ -4,9 +4,11 @@ import cz.neumimto.nts.Descriptor;
 import cz.neumimto.nts.ntsBaseVisitor;
 import cz.neumimto.nts.ntsParser;
 
+import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 public class FnVisitor extends ntsBaseVisitor {
 
@@ -24,13 +26,16 @@ public class FnVisitor extends ntsBaseVisitor {
     public Object visitFunction_call(ntsParser.Function_callContext ctx) {
         String fnName = ctx.function_name.getText();
         if (!lambdas.contains("@" + fnName)) {
-            if (context.stream()
-                    .filter(a-> a instanceof Descriptor)
-                    .filter(a->((Descriptor) a).injectedViaField)
-                    .noneMatch(a->((Descriptor) a).functionName.equalsIgnoreCase(fnName))) {
-
-                functions.add(fnName);
+            for (Object o : context) {
+                if (o instanceof Descriptor d) {
+                    if (d.functionName.equalsIgnoreCase(fnName)) {
+                        if (!d.injectedViaField) {
+                            return super.visitFunction_call(ctx);
+                        }
+                    }
+                }
             }
+            functions.add(fnName);
         }
         return super.visitFunction_call(ctx);
     }

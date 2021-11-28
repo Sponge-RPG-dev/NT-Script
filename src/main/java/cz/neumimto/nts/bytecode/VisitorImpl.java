@@ -63,7 +63,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     @Override
     public ScriptContext visitGetField_statement(ntsParser.GetField_statementContext ctx) {
         String fieldName = ctx.field.getText();
-        Variable variable = scriptContext.getVariable(ctx.fieldOwner.getText()).get();
+        Variable variable = scriptContext.getVariable(ctx.fieldOwner.getText()).orElseThrow(() -> new RuntimeException("Unknown variable " + ctx.fieldOwner.getText()));
         addInsn(variable.load());
         String variableName = ctx.fieldOwner.getText();
 

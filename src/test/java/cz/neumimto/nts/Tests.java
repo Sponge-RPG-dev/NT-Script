@@ -2,8 +2,10 @@ package cz.neumimto.nts;
 
 import cz.neumimto.nts.annotations.ScriptMeta;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 
 import java.lang.reflect.Executable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -339,6 +341,33 @@ public class Tests {
         initAndRun(o);
         o.run(new Input(), new Context());
     }
+
+    @org.junit.jupiter.api.Test
+    public void test8_dont_inject_static_calls() throws Exception {
+        String test = """
+               @a = 1
+               @b = 2
+               @c = min{a=@a, b=@b}
+               
+               RETURN Result.OK
+                """;
+        NTScript script = new NTScript.Builder()
+                .package_("cz.neumimto.test")
+                .debugOutput("/tmp/test")
+                .implementingType(ImplTargets.Subclass.class)
+                .withEnum(Result.class)
+                .add(Math.class.getMethod("min", double.class, double.class), Arrays.asList("a","b"))
+                .setClassNamePattern("test6_typecasts")
+                .build();
+
+        Class aClass = script.compile(test);
+        try {
+            aClass.getField("Math");
+            throw new RuntimeException("Field present");
+        } catch (NoSuchFieldException e) {
+        }
+    }
+
 
     private void initAndRun(Object o) {
         try {
