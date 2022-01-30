@@ -36,57 +36,57 @@ public class Tests {
          @bool_f = false
          @int = 10000
          
-         @param = call{string=@text, func=method{int=50}}
+         @param = call(string=@text, func=method(int=50))
          
-         IF test{int= @int, string=call{string=@text}}
+         IF test(int= @int, string=call(string=@text))
              @int2 = 5000
          END
          
          @text="re-assigment"
-         print{val=@text}
+         print(val=@text)
          
          IF @bool_f
              @int3=700000
          END
                
-         @x = list{size=3}
+         @x = list(size=3)
          FOREACH @entity IN @x
-            print{val=@entity}
+            print(val=@entity)
          END
           
-         print{val="POP NEXT"}
-         list{size=50}
+         print(val="POP NEXT")
+         list(size=50)
          
-         FOREACH @entity IN list{size=5}
-             print{val=@entity}
+         FOREACH @entity IN list(size=5)
+             print(val=@entity)
          END
                
-         print{val="XXXX"}
+         print(val="XXXX")
                
          FOREACH @entity IN @x
             IF True
-             print{val="CCC"}
+             print(val="CCC")
             END
          END
          
          IF @int <= 70000
-           print{val="@int <= 70000"}
+           print(val="@int <= 70000")
          END
          
        #  todo bad operand stack int inlined bool
        #  @lesser = @int <= 70000 
          
-         @test = test_ctr{int=@int}
+         @test = test_ctr(int=@int)
          
-         @obj = test_ctr{int=@int}
+         @obj = test_ctr(int=@int)
          
          IF @int <= 70000 
-             print{val="10000 <= 70000"}
+             print(val="10000 <= 70000")
          END
          
-         method{missing=@obj}
+         method(missing=@obj)
          @function1 = fn @int
-            print{val="FN NOARGS", int=@int}       
+            print(val="FN NOARGS", int=@int)       
          END
        
          RETURN Result.OK
@@ -121,8 +121,8 @@ public class Tests {
                 .withEnum(Result.class)
                 .add(List.of(new A(), new B(), new C(), new L(), new MP(), new P()))
                 .add(DecompileTest.class)
-                .macro(Pattern.compile("\\$say ([a-zA-Z0-1]*)"),"print{v=\"$1\"}")
-                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "print{ctx=@context, key=\"$1\"}")
+                .macro(Pattern.compile("\\$say ([a-zA-Z0-1]*)"),"print(v=\"$1\")")
+                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "print(ctx=@context, key=\"$1\")")
                 .setClassNamePattern("aaa")
                 .build();
 
@@ -137,11 +137,11 @@ public class Tests {
                 @d = $settings.d
                 @r = $settings.r
         
-                @list = find{c=@r, context=@context}
+                @list = find(c=@r, context=@context)
         
                 FOREACH @entity in @list
-                    IF compare{e=@entity, v=5}
-                       print{e=@entity}
+                    IF compare(e=@entity, v=5)
+                       print(e=@entity)
                     END
                 END
         
@@ -154,7 +154,7 @@ public class Tests {
                 .withEnum(Result.class)
                 .add(List.of(new TestFunctions()))
                 .add(DecompileTest.class)
-                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "config_value{context=@context, key=\"$1\"}")
+                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "config_value(context=@context, key=\"$1\")")
                 .setClassNamePattern("test1")
                 .build();
 
@@ -169,8 +169,8 @@ public class Tests {
         String test = """
                 @d = $settings.d
                              
-                IF compare{e=@d, v=5}
-                   print{e=@d}
+                IF compare(e=@d, v=5)
+                   print(e=@d)
                 END
         
                 RETURN Result.OK
@@ -182,7 +182,7 @@ public class Tests {
                 .withEnum(Result.class)
                 .add(List.of(new TestFunctions()))
                 .add(DecompileTest.class)
-                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "config_value{context=@context, key=\"$1\"}")
+                .macro(Pattern.compile("\\$settings.([a-zA-Z0-1]*)"), "config_value(context=@context, key=\"$1\")")
                 .setClassNamePattern("test_if")
                 .build();
 
@@ -196,7 +196,7 @@ public class Tests {
     public void test2_put_get_field() throws Throwable {
         String test = """
                 @k = 20
-                @obj = TestPojo{}
+                @obj = TestPojo()
                 @obj.intField = @k
                 @obj.doubleField = @k
                 @obj.privateField = @k
@@ -231,18 +231,18 @@ public class Tests {
         String test = """
                 @k = 20
                 @k = @k * 8
-                print{int=@k}
+                print(int=@k)
                 @w = 2 * 2
-                print{int=@w}
+                print(int=@w)
                 
                 @j = (3 / 3)
-                print{int=@j}
+                print(int=@j)
                 
                 @j = (3 / 3) + 1
-                print{int=@j}
+                print(int=@j)
           
                 @j = -1 * (3 / 3) - 1
-                print{int=@j}
+                print(int=@j)
                 
                 RETURN Result.OK
                 """;
@@ -264,9 +264,9 @@ public class Tests {
     @org.junit.jupiter.api.Test
     public void test4_lib() throws Throwable {
         String test = """
-               @l=random{} * 0.4 - 0.2
-               print{int=@l}
-               print{int=random{} * 0.4 - 0.2}
+               @l=random() * 0.4 - 0.2
+               print(int=@l)
+               print(int=random() * 0.4 - 0.2)
                RETURN Result.OK
                 """;
         NTScript script = new NTScript.Builder()
@@ -296,9 +296,9 @@ public class Tests {
     public void test5_read_primitive_and_ref() throws Throwable {
         String test = """
                @l=20
-               @obj = TestPojo{}
+               @obj = TestPojo()
                @float = @obj.floatField
-               test{pojo=@obj, float=@float}
+               test(pojo=@obj, float=@float)
                RETURN Result.OK
                 """;
         NTScript script = new NTScript.Builder()
@@ -321,7 +321,7 @@ public class Tests {
     @org.junit.jupiter.api.Test
     public void test6_typecasts() throws Exception {
         String test = """
-               @obj = iface{} as A
+               @obj = iface() as A
                @obj.k = 50
                RETURN Result.OK
                 """;

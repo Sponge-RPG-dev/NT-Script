@@ -76,7 +76,7 @@ iterable :
 
 type_enum : type=IDENTIFIER '.' value=IDENTIFIER ;
 
-function_call : function_name=IDENTIFIER arguments='{'argument? (',' argument)* '}' ('as' type_cast= IDENTIFIER)?;
+function_call : function_name=IDENTIFIER arguments='('argument? (',' argument)* ')' ('as' type_cast= IDENTIFIER)?;
 
 if_statement : IF condition_expression terminator statement_list END ;
 
