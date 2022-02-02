@@ -36,14 +36,14 @@ public class Tests {
          bool_f = false
          int = 10000
          
-         param = call(string:text, func:method(int=50))
+         param = call(string:text, func:method(int:50))
          
-         IF test(int: int, string=call(string:text))
+         IF test(int: int, string: call(string:text))
              int2 = 5000
          END
          
          text="re-assigment"
-         print(val=text)
+         print(val: text)
          
          IF bool_f
              int3=700000
@@ -84,9 +84,9 @@ public class Tests {
              print(val:"10000 <= 70000")
          END
          
-         method(missing=obj)
+         method(missing:obj)
          function1 = fn int
-            print(val:"FN NOARGS", int=int)       
+            print(val:"FN NOARGS", int:int)       
          END
        
          RETURN Result.OK
@@ -137,7 +137,7 @@ public class Tests {
                 d = $settings.d
                 r = $settings.r
         
-                list = find(c: r, context=context)
+                list = find(c: r, context:context)
         
                 FOREACH entity in list
                     IF compare(e: entity, v: 5)
@@ -357,7 +357,7 @@ public class Tests {
                 .implementingType(ImplTargets.Subclass.class)
                 .withEnum(Result.class)
                 .add(Math.class.getMethod("min", double.class, double.class), Arrays.asList("a","b"))
-                .setClassNamePattern("test6_typecasts")
+                .setClassNamePattern("test8_dont_inject_static_calls")
                 .build();
 
         Class aClass = script.compile(test);
