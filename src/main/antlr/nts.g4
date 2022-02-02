@@ -3,7 +3,7 @@ grammar nts;
 script : statement_list EOF;
 
 statement_list : statement terminator
-               | statement_list terminator
+               | statement_list statement terminator
                | terminator
                ;
 

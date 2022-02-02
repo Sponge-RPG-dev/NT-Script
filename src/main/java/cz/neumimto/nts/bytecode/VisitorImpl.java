@@ -170,11 +170,6 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         return scriptContext;
     }
 
-    @Override
-    public ScriptContext visitAssignment_values(ntsParser.Assignment_valuesContext ctx) {
-        return super.visitAssignment_values(ctx);
-    }
-
     protected boolean parseBoolean(String text) {
         if (text.equalsIgnoreCase("t") || text.equalsIgnoreCase("true")) {
             return true;
@@ -197,11 +192,6 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
             throw new RuntimeException("unknown variable reference " + text);
         }
         return scriptContext;
-    }
-
-    @Override
-    public ScriptContext visitTerminal(TerminalNode node) {
-        return super.visitTerminal(node);
     }
 
     @Override
