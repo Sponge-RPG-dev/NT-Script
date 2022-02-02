@@ -37,7 +37,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
     @Override
     public ScriptContext visitAssignment_statement(ntsParser.Assignment_statementContext ctx) {
-        TerminalNode variableIdentifier = ctx.VARIABLE_IDENTIFIER();
+        TerminalNode variableIdentifier = ctx.IDENTIFIER();
         Optional<Variable> var = scriptContext.getVariable(variableIdentifier.getText());
 
         Variable variable = var.orElseGet(() -> scriptContext.createNewVariable(variableIdentifier.getText(), ctx.assignment_values()));
@@ -170,6 +170,11 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         return scriptContext;
     }
 
+    @Override
+    public ScriptContext visitAssignment_values(ntsParser.Assignment_valuesContext ctx) {
+        return super.visitAssignment_values(ctx);
+    }
+
     protected boolean parseBoolean(String text) {
         if (text.equalsIgnoreCase("t") || text.equalsIgnoreCase("true")) {
             return true;
@@ -255,8 +260,12 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
 
     @Override
     public ScriptContext visitFunction_call(ntsParser.Function_callContext ctx) {
+        String line = ctx.getText();
+        if (ctx.arguments == null) {
+            return super.visitFunction_call(ctx);
+        }
         String functionName = ctx.function_name.getText();
-        Optional<Variable> variable = scriptContext.getVariable("@" + functionName);
+        Optional<Variable> variable = scriptContext.getVariable(functionName);
         if (variable.isPresent()) {
             Variable variable1 = variable.get();
             if (variable1.getRuntimeType() != null && Runnable.class.isAssignableFrom(variable1.getRuntimeType())) {
@@ -333,7 +342,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
                 }
             }
             if (parent != null) {
-                Variable variable1 = scriptContext.currentScope().findVariable(parent.VARIABLE_IDENTIFIER().getText());
+                Variable variable1 = scriptContext.currentScope().findVariable(parent.IDENTIFIER().getText());
                 variable1.setRuntimeType(c.getDeclaringClass());
             }
         } else {
@@ -499,7 +508,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         List<ntsParser.Variable_referenceContext> variable_referenceContexts = ctx.variable_reference();
         Map<String, Variable> fnVars = new TreeMap<>();
         for (ntsParser.Variable_referenceContext var : variable_referenceContexts) {
-            String text = var.VARIABLE_IDENTIFIER().getText();
+            String text = var.IDENTIFIER().getText();
             Optional<Variable> variable = scriptContext.getVariable(text);
             if (variable.isEmpty()) {
                 throw new IllegalStateException("Unknown variable " + text);

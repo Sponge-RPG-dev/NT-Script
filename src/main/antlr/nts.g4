@@ -1,24 +1,18 @@
-//header
-/*
-  @myVar =
-
-*/
-
 grammar nts;
 
 script : statement_list EOF;
 
 statement_list : statement terminator
-               | statement_list statement terminator
+               | statement_list terminator
                | terminator
                ;
 
 statement : assignment_statement
           | putField_statement
-          | function_call
           | return_statement
           | if_statement
           | foreach_statement
+          | function_call
           ;
 
 condition_expression : function_call
@@ -37,13 +31,13 @@ comparable_expr : type_bool
                 | function_call
                 ;
 
-variable_reference : variable=VARIABLE_IDENTIFIER ;
+variable_reference : variable=IDENTIFIER ;
 
 
 putField_statement : fieldOwner=variable_reference '.' field=IDENTIFIER '=' value=rval ;
 getField_statement : fieldOwner=variable_reference '.' field=IDENTIFIER ('as' type_cast= IDENTIFIER)?;
 
-assignment_statement : name=VARIABLE_IDENTIFIER '=' value=assignment_values ;
+assignment_statement : name=IDENTIFIER '=' value=assignment_values ;
 
 return_statement	:	RETURN value=rval	;
 
@@ -83,7 +77,7 @@ if_statement : IF condition_expression terminator statement_list END ;
 foreach_statement : FOREACH variable=variable_reference IN collection=iterable terminator statement_list END ;
 
 
-argument : name=IDENTIFIER '=' value=rval   ;
+argument : name=IDENTIFIER ':' value=rval   ;
 
 newline : CRLF;
 
@@ -138,7 +132,6 @@ IN: I N;
 FUNCTION: ( F N | F U N C T I O N );
 
 IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]*;
-VARIABLE_IDENTIFIER : '@' IDENTIFIER;
 fragment DIGIT : ('0'..'9');
 INT : [0-9]+;
 DOT : '.';

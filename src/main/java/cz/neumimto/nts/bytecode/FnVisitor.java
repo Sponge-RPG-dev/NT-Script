@@ -25,7 +25,7 @@ public class FnVisitor extends ntsBaseVisitor {
     @Override
     public Object visitFunction_call(ntsParser.Function_callContext ctx) {
         String fnName = ctx.function_name.getText();
-        if (!lambdas.contains("@" + fnName)) {
+        if (!lambdas.contains(fnName)) {
             for (Object o : context) {
                 if (o instanceof Descriptor d) {
                     if (d.functionName.equalsIgnoreCase(fnName)) {
@@ -43,7 +43,7 @@ public class FnVisitor extends ntsBaseVisitor {
     @Override
     public Object visitAssignment_statement(ntsParser.Assignment_statementContext ctx) {
         if (ctx.assignment_values().lambda() != null) {
-            lambdas.add(ctx.VARIABLE_IDENTIFIER().getText());
+            lambdas.add(ctx.IDENTIFIER().getText());
         }
         return super.visitAssignment_statement(ctx);
     }

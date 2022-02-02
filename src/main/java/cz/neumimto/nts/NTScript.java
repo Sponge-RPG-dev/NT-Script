@@ -277,7 +277,7 @@ public class NTScript {
                 String value = annotation.value();
                 Class<?> type = parameter.getType();
                 MethodVariableAccess opcode = MethodVariableAccess.of(new TypeDescription.ForLoadedType(type));
-                map.put("@" + value, new Variable(i + 1, opcode, type));
+                map.put(value, new Variable(i + 1, opcode, type));
             }
         }
         return map;
