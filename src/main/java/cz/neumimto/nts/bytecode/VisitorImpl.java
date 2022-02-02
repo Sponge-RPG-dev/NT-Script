@@ -63,9 +63,19 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
     @Override
     public ScriptContext visitGetField_statement(ntsParser.GetField_statementContext ctx) {
         String fieldName = ctx.field.getText();
-        Variable variable = scriptContext.getVariable(ctx.fieldOwner.getText()).orElseThrow(() -> new RuntimeException("Unknown variable " + ctx.fieldOwner.getText()));
+        String fieldOwnerName = ctx.fieldOwner.getText();
+
+        Optional<Variable> variableOptional = scriptContext.getVariable(ctx.fieldOwner.getText());
+
+        if (variableOptional.isEmpty()) {
+            Enum enumValue = scriptContext.getEnumValue(fieldOwnerName, fieldName);
+            addInsn(FieldAccess.forEnumeration(new EnumerationDescription.ForLoadedEnumeration(enumValue)));
+            return scriptContext;
+        }
+
+
+        Variable variable = variableOptional.get();
         addInsn(variable.load());
-        String variableName = ctx.fieldOwner.getText();
 
         Variable c = scriptContext.currentScope().lastVariableOnStack;
 
@@ -73,7 +83,7 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         if (c == null) {
             c = scriptContext.currentScope().findVariable(ctx.fieldOwner.getText());
         }
-        Variable fieldOwner = scriptContext.getVariable(variableName).get();
+        Variable fieldOwner = scriptContext.getVariable(fieldOwnerName).get();
 
         try {
             Field field = fieldOwner.getRuntimeType().getField(fieldName);
@@ -222,8 +232,9 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         var rtype = ctx.rval();
 
 
-        if (rtype.type_enum() != null || rtype.type_literal() != null) {
+        if (rtype.getField_statement() != null || rtype.type_literal() != null) {
             visitChildren(rtype);
+            //todo enum or field rimirive from field
             addInsn(MethodReturn.REFERENCE);
 
         } else if (rtype.type_bool() != null) {
@@ -236,15 +247,6 @@ public class VisitorImpl extends ntsBaseVisitor<ScriptContext> {
         } else {
             addInsn(MethodReturn.VOID);
         }
-        return scriptContext;
-    }
-
-    @Override
-    public ScriptContext visitType_enum(ntsParser.Type_enumContext ctx) {
-        String type = ctx.type.getText();
-        String value = ctx.value.getText();
-        Enum enumValue = scriptContext.getEnumValue(type, value);
-        addInsn(FieldAccess.forEnumeration(new EnumerationDescription.ForLoadedEnumeration(enumValue)));
         return scriptContext;
     }
 

@@ -55,7 +55,6 @@ rval : type_literal
      | '(' rval ')'
 
      | function_call
-     | type_enum
      | type_bool
      | variable_reference
      | type_comparison
@@ -67,8 +66,6 @@ iterable :
          | function_call
          | variable_reference
          ;
-
-type_enum : type=IDENTIFIER '.' value=IDENTIFIER ;
 
 function_call : function_name=IDENTIFIER arguments='('argument? (',' argument)* ')' ('as' type_cast= IDENTIFIER)?;
 
@@ -132,6 +129,7 @@ IN: I N;
 FUNCTION: ( F N | F U N C T I O N );
 
 IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]*;
+ENUM_IDENTIFIER : [A-Z_]*;
 fragment DIGIT : ('0'..'9');
 INT : [0-9]+;
 DOT : '.';

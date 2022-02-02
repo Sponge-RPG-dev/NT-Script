@@ -158,16 +158,6 @@ public interface ntsListener extends ParseTreeListener {
 	 */
 	void exitIterable(ntsParser.IterableContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ntsParser#type_enum}.
-	 * @param ctx the parse tree
-	 */
-	void enterType_enum(ntsParser.Type_enumContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ntsParser#type_enum}.
-	 * @param ctx the parse tree
-	 */
-	void exitType_enum(ntsParser.Type_enumContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link ntsParser#function_call}.
 	 * @param ctx the parse tree
 	 */

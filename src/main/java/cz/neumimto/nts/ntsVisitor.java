@@ -101,12 +101,6 @@ public interface ntsVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIterable(ntsParser.IterableContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ntsParser#type_enum}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitType_enum(ntsParser.Type_enumContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link ntsParser#function_call}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

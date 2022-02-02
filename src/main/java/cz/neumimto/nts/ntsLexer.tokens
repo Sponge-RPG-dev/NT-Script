@@ -30,8 +30,9 @@ FOREACH=29
 IN=30
 FUNCTION=31
 IDENTIFIER=32
-INT=33
-DOT=34
+ENUM_IDENTIFIER=33
+INT=34
+DOT=35
 'as'=1
 '('=2
 ')'=3
@@ -48,4 +49,4 @@ DOT=34
 '!='=21
 '>'=24
 '<'=25
-'.'=34
+'.'=35

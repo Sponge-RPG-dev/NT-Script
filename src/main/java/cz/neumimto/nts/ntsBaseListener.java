@@ -196,18 +196,6 @@ public class ntsBaseListener implements ntsListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterType_enum(ntsParser.Type_enumContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitType_enum(ntsParser.Type_enumContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterFunction_call(ntsParser.Function_callContext ctx) { }
 	/**
 	 * {@inheritDoc}
